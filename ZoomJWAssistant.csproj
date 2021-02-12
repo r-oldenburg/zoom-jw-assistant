@@ -14,9 +14,26 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <AutorunEnabled>true</AutorunEnabled>
+    <ApplicationRevision>10</ApplicationRevision>
+    <ApplicationVersion>0.5.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -26,15 +43,46 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>1B63D9A2A9C1484E673F1DCC36C8C9667365DD23</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>ZoomJWAssistant_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetZone>LocalIntranet</TargetZone>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>true</SignManifests>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutoUpdater.NET, Version=1.6.4.0, Culture=neutral, PublicKeyToken=501435c91b35f4bc, processorArchitecture=MSIL">
+      <HintPath>packages\Autoupdater.NET.Official.1.6.4\lib\net45\AutoUpdater.NET.dll</HintPath>
+    </Reference>
+    <Reference Include="AvalonDock, Version=4.50.1.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>packages\Dirkster.AvalonDock.4.50.1\lib\net40\AvalonDock.dll</HintPath>
+    </Reference>
+    <Reference Include="AvalonDock.Themes.Metro, Version=4.50.1.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>packages\Dirkster.AvalonDock.Themes.Metro.4.50.1\lib\net40\AvalonDock.Themes.Metro.dll</HintPath>
+    </Reference>
+    <Reference Include="AvalonDock.Themes.VS2013, Version=4.50.1.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>packages\Dirkster.AvalonDock.Themes.VS2013.4.50.1\lib\net40\AvalonDock.Themes.VS2013.dll</HintPath>
+    </Reference>
     <Reference Include="ControlzEx, Version=4.0.0.0, Culture=neutral, PublicKeyToken=69f1c32f803d307e, processorArchitecture=MSIL">
       <HintPath>packages\ControlzEx.4.4.0\lib\net462\ControlzEx.dll</HintPath>
     </Reference>
@@ -62,6 +110,9 @@
     <Reference Include="NHotkey.Wpf, Version=2.0.0.0, Culture=neutral, PublicKeyToken=a76ffb086700b11c, processorArchitecture=MSIL">
       <HintPath>packages\NHotkey.Wpf.2.1.0\lib\net45\NHotkey.Wpf.dll</HintPath>
     </Reference>
+    <Reference Include="Svg2Xaml, Version=0.3.0.7, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Svg2Xaml.0.3.0.7\lib\net40\Svg2Xaml.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
@@ -69,6 +120,7 @@
     <Reference Include="System.IdentityModel.Tokens.Jwt, Version=6.8.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>packages\System.IdentityModel.Tokens.Jwt.6.8.0\lib\net461\System.IdentityModel.Tokens.Jwt.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml" />
@@ -83,8 +135,9 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="zoom_sdk_dotnet_wrap">
-      <HintPath>..\zoom-c-sharp-wrapper-5.2.42037.1112\bin\zoom_sdk_dotnet_wrap.dll</HintPath>
+    <Reference Include="zoom_sdk_dotnet_wrap, Version=1.0.7701.17127, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>zoom-c-sharp-wrapper\bin\zoom_sdk_dotnet_wrap.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -92,19 +145,34 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ExampleViews\MeetingInfoDialog.xaml.cs">
+    <Compile Include="Core\ObservableExtensions.cs" />
+    <Compile Include="Core\StringCipher.cs" />
+    <Compile Include="Core\TextBoxOutputter.cs" />
+    <Compile Include="Core\Threading\BaseUIDispatchingService.cs" />
+    <Compile Include="Core\Threading\MeetingParticipantsController.cs" />
+    <Compile Include="Core\Threading\MeetingService.cs" />
+    <Compile Include="Core\ZoomConstants.cs" />
+    <Compile Include="Core\ZoomService.cs" />
+    <Compile Include="Models\MeetingAttendeeRename.cs" />
+    <Compile Include="Test\TestData.cs" />
+    <Compile Include="ValueConverter\AttendeeStateToImageConverter.cs" />
+    <Compile Include="ValueConverter\AttendeeToImageConverter.cs" />
+    <Compile Include="ValueConverter\BoolToImageConverter.cs" />
+    <Compile Include="ValueConverter\BoolToStringConverter.cs" />
+    <Compile Include="ValueConverter\TypeNameConverter.cs" />
+    <Compile Include="Views\MeetingInfoDialog.xaml.cs">
       <DependentUpon>MeetingInfoDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="JWTTokenCreator.cs" />
+    <Compile Include="Core\JWTTokenCreator.cs" />
     <Compile Include="MainWindowViewModel.cs" />
     <Compile Include="Models\MeetingAttendee.cs" />
     <Compile Include="ValueConverter\Int32IndexToNumberConverter.cs" />
     <Compile Include="ValueConverter\ItemCountConverter.cs" />
-    <Page Include="ExampleViews\MeetingInfoDialog.xaml">
+    <Page Include="Views\MeetingInfoDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="ExampleViews\DataGridExamples.xaml">
+    <Page Include="Views\AttendeesView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -118,8 +186,8 @@
     </Compile>
     <Compile Include="Core\SimpleCommand.cs" />
     <Compile Include="Core\ViewModelBase.cs" />
-    <Compile Include="ExampleViews\DataGridExamples.xaml.cs">
-      <DependentUpon>DataGridExamples.xaml</DependentUpon>
+    <Compile Include="Views\AttendeesView.xaml.cs">
+      <DependentUpon>AttendeesView.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -127,10 +195,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\Album.cs" />
-    <Compile Include="Models\Artist.cs" />
     <Compile Include="Models\MeetingInfoContent.cs" />
-    <Compile Include="Models\Genre.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -149,23 +214,77 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="packages.config" />
+    <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="resources\jw-zoom-icon.icl" />
+    <None Include="Resources\jw-zoom-icon.icl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="resources\Icon1.ico" />
-    <Resource Include="resources\Icon2.ico" />
-    <Resource Include="resources\Icon3.ico" />
-    <Resource Include="resources\Icon4.ico" />
-    <Resource Include="resources\Icon5.ico" />
-    <Resource Include="resources\Icon6.ico" />
-    <Resource Include="resources\Icon7.ico" />
+    <Resource Include="Resources\symbols\call.svg" />
+    <Resource Include="Lizensierung.txt" />
+    <Resource Include="Release.xml" />
+    <Content Include="Resources\symbols\call-hand.svg" />
+    <Content Include="Resources\symbols\call-mute-hand.svg" />
+    <Content Include="Resources\symbols\call-mute.svg" />
+    <Content Include="Resources\symbols\close-outline.svg" />
+    <Content Include="Resources\symbols\desktop.svg" />
+    <Content Include="Resources\symbols\hand-left-outline.svg" />
+    <Content Include="Resources\symbols\star.svg" />
+    <Content Include="zoom-c-sharp-wrapper/bin/*.dll" Link="%(Filename)%(Extension)">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icon1.ico" />
+    <Resource Include="Resources\Icon2.ico" />
+    <Resource Include="Resources\Icon3.ico" />
+    <Resource Include="Resources\Icon4.ico" />
+    <Resource Include="Resources\Icon5.ico" />
+    <Resource Include="Resources\Icon6.ico" />
+    <Resource Include="Resources\Icon7.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Notizen.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.7.2 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="zoom-c-sharp-wrapper\bin\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PublishFile Include="zoom_sdk_dotnet_wrap.dll">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Exclude</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>File</FileType>
+    </PublishFile>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
 </Project>

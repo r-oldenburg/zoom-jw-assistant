@@ -4,7 +4,7 @@
 
 using System.Windows.Controls;
 
-namespace ZoomJWAssistant.ExampleViews
+namespace ZoomJWAssistant.Views
 {
     /// <summary>
     /// Interaction logic for CustomDialogContent.xaml

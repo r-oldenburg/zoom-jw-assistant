@@ -1,0 +1,3 @@
+﻿https://devforum.zoom.us/t/publishing-a-windows-desktop-app-with-zoom-integration-api-sdk/24125
+https://devforum.zoom.us/t/windows-sdk/5332/5
+https://devforum.zoom.us/t/licensing-sharing-a-non-commercial-private-app-bundled-with-sdk/42105

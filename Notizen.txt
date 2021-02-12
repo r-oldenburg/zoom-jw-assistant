@@ -1,0 +1,7 @@
+﻿https://jsonbin.io/api-reference/bins/create
+
+ - Neue View: Grid mit "Known Members" und Aliase
+ - Bilder aus Enum erzeugen EnumToImageConverter, nicht aus Attendee
+ - Publishing mit Symbolen funzt?
+ - Auto Update
+ - Ask for SDK Key/Secret

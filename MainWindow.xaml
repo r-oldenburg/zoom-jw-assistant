@@ -2,56 +2,39 @@
                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                 xmlns:exampleViews="clr-namespace:ZoomJWAssistant.ExampleViews"
-                 xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
                  xmlns:local="clr-namespace:ZoomJWAssistant"
                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                 xmlns:theming="urn:controlzex"
-                 Title="MahApps.Metro - Demo Application"
+                 xmlns:vc="clr-namespace:ZoomJWAssistant.ValueConverter"
+                 Title="ZOOM - JW Assistant"
                  Width="900"
                  Height="600"
                  d:DataContext="{d:DesignInstance local:MainWindowViewModel}"
                  d:DesignHeight="600"
                  d:DesignWidth="800"
                  mah:DialogParticipation.Register="{Binding}"
+                 Topmost="{Binding ZoomService.InMeeting}"
                  GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
                  Icon="resources\Icon7.ico"
-                 NonActiveGlowBrush="#CDFF0000"
                  ShowIconOnTitleBar="True"
                  ShowTitleBar="{Binding ShowMyTitleBar, Mode=TwoWay}"
                  WindowStartupLocation="CenterScreen"
+                 Closing="MetroWindow_Closing"
                  mc:Ignorable="d">
-
     <Window.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Clean/Controls.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-
-            <ObjectDataProvider x:Key="HorizontalAlignmentEnumValues"
-                                MethodName="GetValues"
-                                ObjectType="{x:Type HorizontalAlignment}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="HorizontalAlignment" />
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
-
-            <DataTemplate x:Key="Temp0">
-                <TextBlock Text="Nothing selected" />
-            </DataTemplate>
-            <DataTemplate x:Key="Temp1">
-                <TextBlock Text="Something about Item 1" />
-            </DataTemplate>
-            <DataTemplate x:Key="Temp2">
-                <TextBlock Text="Another thing about Item 2" />
-            </DataTemplate>
+            <vc:BoolToStringConverter x:Key="BoolToStringConverter" />
+            <vc:AttendeeToImageConverter x:Key="AttendeeToImageConverter" />
+            <vc:TypeNameConverter x:Key="TypeNameConverter" />
         </ResourceDictionary>
     </Window.Resources>
 
     <mah:MetroWindow.RightWindowCommands>
         <mah:WindowCommands>
-            <ToggleButton Content="Automatik" />
+            <ToggleButton Click="ToggleButton_Click" DataContext="{Binding ZoomService.MyAttendee}" 
+                          Content="{Binding IsHost, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Host;KEIN Host'}" />
+            <ToggleButton Click="ToggleButton_Click" DataContext="{Binding ZoomService.MyAttendee}" 
+                          Content="{Binding IsCoHost, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Co-Host;'}" />
         </mah:WindowCommands>
     </mah:MetroWindow.RightWindowCommands>
 
@@ -61,14 +44,222 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0">
-            <exampleViews:DataGridExamples DataContext="{Binding}" />
-        </Grid>
+        <DockingManager
+            x:Name="dockManager"
+            Grid.Row="0" 
+            AllowMixedOrientation="True"
+            AutoWindowSizeWhenOpened="False"
+            DocumentClosing="DockManager_DocumentClosing"
+            DockPanel.Dock="Bottom"
+            IsVirtualizingAnchorable="True"
+            IsVirtualizingDocument="True">
+            <DockingManager.Theme>
+                <Vs2013LightTheme />
+            </DockingManager.Theme>
+            <DockingManager.DocumentHeaderTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Margin="0,0,4,0" Source="{Binding IconSource}" />
+                        <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                </DataTemplate>
+            </DockingManager.DocumentHeaderTemplate>
+
+            <LayoutRoot>
+                <LayoutPanel Orientation="Vertical">
+                    <LayoutAnchorablePaneGroup DockHeight="3*">
+                        <LayoutAnchorablePane DockWidth="2*">
+                            <LayoutAnchorable 
+                                CanClose="False"
+                                CanHide="False"
+                                Title="Teilnehmer" 
+                                ContentId="document1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+
+                                    <TextBox x:Name="AttendeeSearchText" 
+                                             Grid.Row="0" 
+                                             Text="{Binding AttendeeSearchText, UpdateSourceTrigger=PropertyChanged,Delay=350}"
+                                             mah:TextBoxHelper.Watermark="Suche nach..." 
+                                             mah:TextBoxHelper.ClearTextButton="True" />
+                                    <DataGrid x:Name="MeetingAttendeesGrid"
+                                              Grid.Row="1" 
+                                        Margin="5"
+                                        AutoGenerateColumns="False"
+                                        EnableColumnVirtualization="False"
+                                        EnableRowVirtualization="False"
+                                        HeadersVisibility="Column"
+                                        ItemsSource="{Binding Path=ZoomService.Attendees}"
+                                        SelectionUnit="FullRow"
+                                        CanUserAddRows="false"
+                                        VirtualizingPanel.IsVirtualizingWhenGrouping="False">
+                                        <DataGrid.Columns>
+                                            <DataGridCheckBoxColumn Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=IsSelected, Mode=OneWay}" Header="" Width="Auto"/>
+                                            <DataGridTemplateColumn Header="Typ" IsReadOnly="True" Width="Auto">
+                                                <DataGridTemplateColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <Image Width="16" Height="16" Source="{Binding Path=., Converter={StaticResource AttendeeToImageConverter}}" />
+                                                    </DataTemplate>
+                                                </DataGridTemplateColumn.CellTemplate>
+                                            </DataGridTemplateColumn>
+                                            <mah:DataGridNumericUpDownColumn Maximum="10" Minimum="0" Binding="{Binding NumberOfPersons}" Header="Anzahl" StringFormat="0" Width="*"/>
+                                            <DataGridTextColumn Binding="{Binding Name}" Header="Name" Width="2*" />
+                                            <DataGridTextColumn Binding="{Binding UserId, Mode=OneWay}" Header="UserId" Width="*" />
+                                            <DataGridTextColumn Binding="{Binding CurrentTechnicalName}" IsReadOnly="True" Header="Meeting-Name" Width="3*"/>
+                                        </DataGrid.Columns>
+
+                                        <!-- 
+                                        <DataGrid.Resources>
+                                            <Style TargetType="DataGridCell"  BasedOn="{StaticResource {x:Type DataGridCell}}">
+                                                <Style.Triggers>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True" />
+                                                            <Condition Binding="{Binding IsReadOnly, RelativeSource={RelativeSource Self}}" Value="False" />
+                                                            <Condition Binding="{Binding Content, RelativeSource={RelativeSource Self}, Converter={StaticResource TypeNameConverter}}" Value="NumericUpDown" />
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter Property="IsEditing" Value="True" />
+                                                    </MultiDataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </DataGrid.Resources>
+                                        <DataGrid.GroupStyle>
+                                            <GroupStyle ContainerStyle="{StaticResource MahApps.Styles.GroupItem.DataGrid}">
+                                                <GroupStyle.HeaderTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock VerticalAlignment="Center">
+                                                            <TextBlock.Text>
+                                                                <MultiBinding StringFormat="{}{0} - {1}">
+                                                                    <Binding Mode="OneWay" Path="Name" />
+                                                                    <Binding Converter="{vc:ItemCountConverter}"
+                                                                        Mode="OneWay"
+                                                                        Path="ItemCount" /> 
+                                                                </MultiBinding>
+                                                            </TextBlock.Text>
+                                                        </TextBlock>
+                                                    </DataTemplate>
+                                                </GroupStyle.HeaderTemplate>
+                                            </GroupStyle>
+                                        </DataGrid.GroupStyle>
+                                        <DataGrid.RowStyle>
+                                            <Style BasedOn="{StaticResource MahApps.Styles.DataGridRow}" TargetType="{x:Type DataGridRow}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Price, Mode=OneWay}" Value="True">
+                                                        <Setter Property="Background" Value="#FF8B8B" />
+                                                        <Setter Property="Foreground" Value="DarkRed" />
+                                                    </DataTrigger>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding Path=IsMouseOver, RelativeSource={RelativeSource Self}}" Value="true" />
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter Property="Background" Value="#FFBDBD" />
+                                                    </MultiDataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </DataGrid.RowStyle>
+                                            -->
+                                        <DataGrid.Style>
+                                            <Style BasedOn="{StaticResource MahApps.Styles.DataGrid}" TargetType="{x:Type DataGrid}">
+                                                <Setter Property="AlternatingRowBackground" Value="{DynamicResource MahApps.Brushes.Gray10}" />
+                                            </Style>
+                                        </DataGrid.Style>
+                                    </DataGrid>                                    
+                                </Grid>
+                            </LayoutAnchorable>
+
+                            <LayoutAnchorable 
+                                CanClose="False"
+                                CanHide="False"
+                                Title="Umbenennungen" 
+                                ContentId="document2">
+                                <TextBox MinHeight="50" 
+                                         Width="Auto" 
+                                         ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                         DataContext="{Binding ZoomService}" 
+                                         Text="{Binding DefaultRenames}" 
+                                         x:Name="DefaultRenamesTextBox" 
+                                         FontFamily="Consolas" 
+                                         FontSize="14px"
+                                         TextWrapping="Wrap" 
+                                         AcceptsReturn="True" 
+                                         />
+                            </LayoutAnchorable>
+
+                        </LayoutAnchorablePane>
+
+                        <LayoutAnchorablePaneGroup DockHeight="1*" Orientation="Vertical">
+                            <LayoutAnchorablePane DockWidth="1*">
+                                <LayoutAnchorable
+                                    x:Name="AttendeesDetailsView"
+                                    Title="Details"
+                                    CanClose="False"
+                                    CanHide="False"
+                                    ContentId="AttendeesDetailsView"
+                                    ToolTip="Details">
+                                    <Grid Margin="0,10" DataContext="{Binding Mode=OneWay, ElementName=MeetingAttendeesGrid, Path=CurrentItem}" VerticalAlignment="Stretch">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition MinWidth="100" Width="Auto" SharedSizeGroup="labels" />
+                                            <ColumnDefinition Width="*" MinWidth="150" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Text="ID: " FontWeight="Bold" />
+                                        <TextBlock Text="{Binding UserId}" Grid.Column="1" />
+                                        <TextBlock Text="Name: " FontWeight="Bold" Grid.Row="1" />
+                                        <TextBlock Text="{Binding Name}" Grid.Column="1" Grid.Row="1" />
+                                        <TextBlock Text="Bisherige Namen: " FontWeight="Bold" Grid.ColumnSpan="2" Grid.Row="2" />
+                                        <TextBlock Text="{Binding PreviousNamesJoined}" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="3" />
+                                    </Grid>
+                                </LayoutAnchorable>
+                            </LayoutAnchorablePane>
+                            <LayoutAnchorablePane>
+                                <LayoutAnchorable
+                                x:Name="VideoView"
+                                Title="Video"
+                                CanClose="False"
+                                CanHide="False"
+                                CanFloat="False"
+                                ContentId="VideoView"
+                                ToolTip="Video">
+                                    <Canvas x:Name="VideoCanvas" DataContext="{Binding Mode=OneWay, ElementName=MeetingAttendeesGrid, Path=CurrentItem}" Background="#222222" Height="Auto" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4" VerticalAlignment="Stretch" />
+                                </LayoutAnchorable>
+                            </LayoutAnchorablePane>
+                        </LayoutAnchorablePaneGroup>
+                    </LayoutAnchorablePaneGroup>
+
+                    <LayoutAnchorablePaneGroup DockHeight="1*">
+                        <LayoutAnchorablePane>
+                            <LayoutAnchorable
+                                x:Name="ConsoleView"
+                                Title="Konsole"
+                                CanClose="False"
+                                CanHide="False"
+                                ContentId="ConsoleView"
+                                ToolTip="Konsole">
+                                <TextBox MinHeight="50" IsReadOnly="True" Width="Auto" x:Name="ConsoleTextBox" FontFamily="Consolas" FontSize="14px"/>
+                            </LayoutAnchorable>
+                        </LayoutAnchorablePane>
+                    </LayoutAnchorablePaneGroup>
+                </LayoutPanel>
+            </LayoutRoot>
+        </DockingManager>
 
         <StatusBar Grid.Row="1">
-            <StatusBarItem>MahApps.Metro Clean Window</StatusBarItem>
-            <Separator Style="{StaticResource MahApps.Styles.Separator.Clean}" />
-            <StatusBarItem>Some stuff</StatusBarItem>
+            <StatusBarItem>Zoom JW Assistant</StatusBarItem>
+            <Separator Style="{StaticResource MahApps.Styles.Separator.StatusBar}" />
+            <StatusBarItem Content="{Binding ZoomService.MeetingStatus}"></StatusBarItem>
+            <Separator Style="{StaticResource MahApps.Styles.Separator.StatusBar}" />
+            <TextBlock Text="{Binding Path=ZoomService.TotalNumberOfPersons, StringFormat='Anzahl Teilnehmer: {0}'}" />
+            <StatusBarItem HorizontalAlignment="Right" Content="{Binding Version}" />
         </StatusBar>
     </Grid>
 

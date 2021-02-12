@@ -4,14 +4,14 @@
 
 using System.Windows.Controls;
 
-namespace ZoomJWAssistant.ExampleViews
+namespace ZoomJWAssistant.Views
 {
     /// <summary>
     /// Interaction logic for DataGridExamples.xaml
     /// </summary>
-    public partial class DataGridExamples : UserControl
+    public partial class AttendeesView : UserControl
     {
-        public DataGridExamples()
+        public AttendeesView()
         {
             InitializeComponent();
         }

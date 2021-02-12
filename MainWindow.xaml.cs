@@ -1,12 +1,15 @@
 ﻿using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using System;
-using System.Configuration;
 using System.Threading.Tasks;
 using System.Windows;
-using ZOOM_SDK_DOTNET_WRAP;
-using ZoomJWAssistant.ExampleViews;
+using ZoomJWAssistant.Core;
+using ZoomJWAssistant.Views;
 using ZoomJWAssistant.Models;
+using AvalonDock.Layout;
+using System.Diagnostics;
+using AvalonDock;
+using AutoUpdaterDotNET;
 
 namespace ZoomJWAssistant
 {
@@ -15,19 +18,28 @@ namespace ZoomJWAssistant
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
+        public readonly ZoomService ZoomService = ZoomService.Instance;
+
         private bool _shutdown;
         private readonly MainWindowViewModel _viewModel;
 
+        TextBoxOutputter consoleOutputter;
+
         public MainWindow()
         {
-            _viewModel = new MainWindowViewModel(DialogCoordinator.Instance);
+            _viewModel = new MainWindowViewModel();
             DataContext = _viewModel;
 
             InitializeComponent();
+
+            consoleOutputter = new TextBoxOutputter(ConsoleTextBox);
+            Console.SetOut(consoleOutputter);
         }
 
         protected async override void OnContentRendered(EventArgs e)
         {
+            AutoUpdater.Start("https://raw.githubusercontent.com/r-oldenburg/zoom-jw-assistant/master/Release.xml");
+
             var customDialog = new CustomDialog() { Title = "Mit Meeting verbinden" };
 
             var dataContext = new MeetingInfoContent(async instance =>
@@ -35,179 +47,64 @@ namespace ZoomJWAssistant
                 await this.HideMetroDialogAsync(customDialog);
                 Properties.Settings.Default.RememberLastMeetingDetails = instance.Remember;
                 Properties.Settings.Default.LastMeetingId = instance.MeetingId;
+                Properties.Settings.Default.LastMeetingPassword = StringCipher.Encrypt(instance.MeetingPassword, instance.MeetingId);
                 Properties.Settings.Default.LastUserName = instance.UserName ?? "JW Admin";
-                Properties.Settings.Default.Save();
+                if (instance.Remember)
+                {
+                    Properties.Settings.Default.Save();
+                }
 
-                await this.JoinMeetingAsync(instance.MeetingId, instance.UserName);
-            });
+                await this.JoinMeetingAsync(instance.MeetingId, instance.MeetingPassword, instance.UserName);
+            }, instance => this.HideMetroDialogAsync(customDialog));
+
             dataContext.Remember = Properties.Settings.Default.RememberLastMeetingDetails;
             dataContext.MeetingId = Properties.Settings.Default.LastMeetingId;
+            if (!string.IsNullOrWhiteSpace(dataContext.MeetingId) && !string.IsNullOrWhiteSpace(Properties.Settings.Default.LastMeetingPassword))
+            {
+                dataContext.MeetingPassword = StringCipher.Decrypt(Properties.Settings.Default.LastMeetingPassword, dataContext.MeetingId);
+            }
             dataContext.UserName = Properties.Settings.Default.LastUserName;
 
             customDialog.Content = new MeetingInfoDialog { DataContext = dataContext };
+            ((MeetingInfoDialog)customDialog.Content).MeetingPassword.Password = dataContext.MeetingPassword;
 
             await this.ShowMetroDialogAsync(customDialog);
         }
 
-        public async Task JoinMeetingAsync(string meetingId, string userName) {
+        public async Task JoinMeetingAsync(string meetingId, string meetingPassword, string userName) {
             var controller = await this.ShowProgressAsync("Anmeldung", "Meeting wird verbunden...");
             controller.SetIndeterminate();
 
-            //init sdk
-            ZOOM_SDK_DOTNET_WRAP.InitParam initParam = new ZOOM_SDK_DOTNET_WRAP.InitParam();
-            initParam.web_domain = "https://zoom.us";
-            ZOOM_SDK_DOTNET_WRAP.SDKError err = ZOOM_SDK_DOTNET_WRAP.CZoomSDKeDotNetWrap.Instance.Initialize(initParam);
-            if (ZOOM_SDK_DOTNET_WRAP.SDKError.SDKERR_SUCCESS == err)
-            {
-            }
-            else//error handle.todo
-            {
-                await controller.CloseAsync();
-                return;
-            }
-
-            CZoomSDKeDotNetWrap.Instance.GetAuthServiceWrap().Add_CB_onAuthenticationReturn(async ret =>
-            {
-                if (AuthResult.AUTHRET_SUCCESS == ret)
-                {
-                    JoinParam param = new JoinParam();
-                    param.userType = SDKUserType.SDK_UT_WITHOUT_LOGIN;
-                    JoinParam4WithoutLogin join_api_param = new JoinParam4WithoutLogin();
-
-                    join_api_param.meetingNumber = UInt64.Parse(meetingId);
-                    join_api_param.userName = userName;
-                    join_api_param.isDirectShareDesktop = false;
-                    join_api_param.isAudioOff = true;
-                    join_api_param.isVideoOff = true;
-
-                    param.withoutloginJoin = join_api_param;
-
-                    err = CZoomSDKeDotNetWrap.Instance.GetMeetingServiceWrap().Join(param);
-                    if (SDKError.SDKERR_SUCCESS == err)
-                    {
-                        await controller.CloseAsync();
-                        //Hide();
-                    }
-                    else//error handle
-                    {
-                        await controller.CloseAsync();
-                    }
-                }
-                else//error handle.todo
-                {
-                    await controller.CloseAsync();
-                }
-            });
-
-            var sdkKey = Environment.ExpandEnvironmentVariables(ConfigurationManager.AppSettings["sdkKey"]);
-            var sdkSecret = Environment.ExpandEnvironmentVariables(ConfigurationManager.AppSettings["sdkSecret"]);
-
-            CZoomSDKeDotNetWrap.Instance.GetAuthServiceWrap().SDKAuth(new AuthContext
-            {
-                jwt_token = JWTTokenCreator.CreateToken(sdkKey, sdkSecret)
-            });
-
-        }
-
-        //callback
-        public void onAuthenticationReturn(AuthResult ret)
-        {
-            if (AuthResult.AUTHRET_SUCCESS == ret)
-            {
-                Show();
-            }
-            else//error handle.todo
-            {
-
-            }
-        }
-
-        private async void ShowMessageDialog(object sender, RoutedEventArgs e)
-        {
-            // This demo runs on .Net 4.0, but we're using the Microsoft.Bcl.Async package so we have async/await support
-            // The package is only used by the demo and not a dependency of the library!
-            var mySettings = new MetroDialogSettings()
-            {
-                AffirmativeButtonText = "Hi",
-                NegativeButtonText = "Go away!",
-                FirstAuxiliaryButtonText = "Cancel",
-                ColorScheme = MetroDialogOptions.ColorScheme,
-                DialogButtonFontSize = 20D
-            };
-
-            MessageDialogResult result = await this.ShowMessageAsync("Hello!", "Welcome to the world of metro!",
-                                                                        MessageDialogStyle.AffirmativeAndNegativeAndSingleAuxiliary, mySettings);
-
-            if (result != MessageDialogResult.FirstAuxiliary)
-                await this.ShowMessageAsync("Result", "You said: " + (result == MessageDialogResult.Affirmative
-                                                ? mySettings.AffirmativeButtonText
-                                                : mySettings.NegativeButtonText +
-                                                    Environment.NewLine + Environment.NewLine + "This dialog will follow the Use Accent setting."));
-        }
-
-        private async void ShowProgressDialog(object sender, RoutedEventArgs e)
-        {
-            var mySettings = new MetroDialogSettings()
-            {
-                NegativeButtonText = "Close now",
-                AnimateShow = false,
-                AnimateHide = false,
-                ColorScheme = this.MetroDialogOptions.ColorScheme
-            };
-
-            var controller = await this.ShowProgressAsync("Please wait...", "We are baking some cupcakes!", settings: mySettings);
-            controller.SetIndeterminate();
-
-            await Task.Delay(5000);
-
-            controller.SetCancelable(true);
-
-            double i = 0.0;
-            while (i < 6.0)
-            {
-                double val = (i / 100.0) * 20.0;
-                controller.SetProgress(val);
-                controller.SetMessage("Baking cupcake: " + i + "...");
-
-                if (controller.IsCanceled)
-                    break; //canceled progressdialog auto closes.
-
-                i += 1.0;
-
-                await Task.Delay(2000);
-            }
+            await ZoomService.JoinMeetingAsync(ulong.Parse(meetingId.Trim().Replace(" ", "")), meetingPassword, userName, this.VideoCanvas);
 
             await controller.CloseAsync();
+        }
 
-            if (controller.IsCanceled)
+        private void DockManager_DocumentClosing(object sender, DocumentClosingEventArgs e)
+        {
+            if (MessageBox.Show("Are you sure you want to close the document?", "AvalonDock Sample", MessageBoxButton.YesNo) == MessageBoxResult.No)
+                e.Cancel = true;
+        }
+
+        private void OnLayoutRootPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            var activeContent = ((LayoutRoot)sender).ActiveContent;
+            if (e.PropertyName == "ActiveContent")
             {
-                await this.ShowMessageAsync("No cupcakes!", "You stopped baking!");
-            }
-            else
-            {
-                await this.ShowMessageAsync("Cupcakes!", "Your cupcakes are finished! Enjoy!");
+                Debug.WriteLine(string.Format("ActiveContent-> {0}", activeContent));
             }
         }
 
         private void MetroWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            ZoomService.Instance.Shutdown();
+
             if (e.Cancel)
             {
                 return;
             }
 
-            if (_viewModel.QuitConfirmationEnabled
-                && _shutdown == false)
-            {
-                e.Cancel = true;
-
-                // We have to delay the execution through BeginInvoke to prevent potential re-entrancy
-                Dispatcher.BeginInvoke(new Action(async () => await this.ConfirmShutdown()));
-            }
-            else
-            {
-                _viewModel.Dispose();
-            }
+            _viewModel.Dispose();
         }
 
         private async Task ConfirmShutdown()
@@ -230,6 +127,11 @@ namespace ZoomJWAssistant
             {
                 Application.Current.Shutdown();
             }
+        }
+
+        private void ToggleButton_Click(object sender, RoutedEventArgs e)
+        {
+            ZoomService.ToggleHost();
         }
     }
 }

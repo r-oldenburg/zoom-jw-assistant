@@ -3,7 +3,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
-namespace ZoomJWAssistant
+namespace ZoomJWAssistant.Core
 {
     class JWTTokenCreator
     {
