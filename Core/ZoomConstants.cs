@@ -62,5 +62,70 @@ namespace ZoomJWAssistant.Core
 
             return "Unknown";
         }
+
+        public static string MeetingStatusDecoder(MeetingStatus status)
+        {
+            string statusString;
+
+            switch (status)
+            {
+                case MeetingStatus.MEETING_STATUS_IDLE:
+                    statusString = "Kein Meeting aktiv.";
+                    break;
+                case MeetingStatus.MEETING_STATUS_CONNECTING:
+                    statusString = "Verbinde...";
+                    break;
+                case MeetingStatus.MEETING_STATUS_WAITINGFORHOST:
+                    statusString = "Warte, dass Host Meeting startet";
+                    break;
+                case MeetingStatus.MEETING_STATUS_INMEETING:
+                    statusString = "Meeting erfoglreich begetreten";
+                    break;
+                case MeetingStatus.MEETING_STATUS_DISCONNECTING:
+                    statusString = "Verbindung abbrechen...";
+                    break;
+                case MeetingStatus.MEETING_STATUS_RECONNECTING:
+                    statusString = "Verbinde mit Meeting neu...";
+                    break;
+                case MeetingStatus.MEETING_STATUS_FAILED:
+                    statusString = "Fehler beim Verbinden mit Meeting-Server.";
+                    break;
+                case MeetingStatus.MEETING_STATUS_ENDED:
+                    statusString = "Meeting beendet.";
+                    break;
+                case MeetingStatus.MEETING_STATUS_UNKNOW:
+                    statusString = "Unbekannter Status";
+                    break;
+                case MeetingStatus.MEETING_STATUS_LOCKED:
+                    statusString = "Meeting is locked to prevent the further participants to join the meeting.";
+                    break;
+                case MeetingStatus.MEETING_STATUS_UNLOCKED:
+                    statusString = "Meeting is open and participants can join the meeting.";
+                    break;
+                case MeetingStatus.MEETING_STATUS_IN_WAITING_ROOM:
+                    statusString = "Im Warteraum...";
+                    break;
+                case MeetingStatus.MEETING_STATUS_WEBINAR_PROMOTE:
+                    statusString = "Upgrade the attendees to panelist in webinar.";
+                    break;
+                case MeetingStatus.MEETING_STATUS_WEBINAR_DEPROMOTE:
+                    statusString = "Downgrade the attendees from the panelist.";
+                    break;
+                case MeetingStatus.MEETING_STATUS_JOIN_BREAKOUT_ROOM:
+                    statusString = "Join the breakout room.";
+                    break;
+                case MeetingStatus.MEETING_STATUS_LEAVE_BREAKOUT_ROOM:
+                    statusString = "Leave the breakout room.";
+                    break;
+                case MeetingStatus.MEETING_STATUS_WAITING_EXTERNAL_SESSION_KEY:
+                    statusString = "Waiting for the additional secret key.";
+                    break;
+                default:
+                    statusString = "Unbekannter Status.";
+                    break;
+            }
+
+            return statusString;
+        }
     }
 }

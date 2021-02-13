@@ -13,7 +13,6 @@
                  d:DesignHeight="600"
                  d:DesignWidth="800"
                  mah:DialogParticipation.Register="{Binding}"
-                 Topmost="{Binding ZoomService.InMeeting}"
                  GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
                  Icon="resources\Icon7.ico"
                  ShowIconOnTitleBar="True"
@@ -23,18 +22,35 @@
                  mc:Ignorable="d">
     <Window.Resources>
         <ResourceDictionary>
+            <Style x:Key="StatusBarHyperLink" TargetType="{x:Type Hyperlink}">
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="Foreground" Value="#99C9EF" />
+                <Setter Property="TextBlock.TextDecorations" Value="{x:Null}" />
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Foreground" Value="White" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
             <vc:BoolToStringConverter x:Key="BoolToStringConverter" />
             <vc:AttendeeToImageConverter x:Key="AttendeeToImageConverter" />
             <vc:TypeNameConverter x:Key="TypeNameConverter" />
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <vc:BooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter" True="Collapsed" False="Visible" />
         </ResourceDictionary>
     </Window.Resources>
 
     <mah:MetroWindow.RightWindowCommands>
         <mah:WindowCommands>
-            <ToggleButton Click="ToggleButton_Click" DataContext="{Binding ZoomService.MyAttendee}" 
-                          Content="{Binding IsHost, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Host;KEIN Host'}" />
-            <ToggleButton Click="ToggleButton_Click" DataContext="{Binding ZoomService.MyAttendee}" 
-                          Content="{Binding IsCoHost, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Co-Host;'}" />
+            <ToggleButton Visibility="{Binding InMeeting, Converter={StaticResource InvertedBooleanToVisibilityConverter}}" 
+                          Click="JoinButton_Click" DataContext="{Binding ZoomService}" 
+                          Content="Einwählen" />
+            <ToggleButton Visibility="{Binding InMeeting, Converter={StaticResource BooleanToVisibilityConverter}}" 
+                          Click="ToggleButton_Click" DataContext="{Binding ZoomService}" 
+                          Content="{Binding MyAttendee.IsHost, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Host;KEIN Host'}" />
+            <ToggleButton Visibility="{Binding MyAttendee.IsCoHost, Converter={StaticResource BooleanToVisibilityConverter}}" 
+                          Click="ToggleButton_Click" DataContext="{Binding ZoomService}" 
+                          Content="{Binding MyAttendee.IsCoHost, Converter={StaticResource BoolToStringConverter}, ConverterParameter='Co-Host;'}" />
         </mah:WindowCommands>
     </mah:MetroWindow.RightWindowCommands>
 
@@ -74,7 +90,7 @@
                                 CanHide="False"
                                 Title="Teilnehmer" 
                                 ContentId="document1">
-                                <Grid>
+                                <Grid IsEnabled="{Binding ZoomService.InMeeting}">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition Height="*" />
@@ -198,8 +214,12 @@
                                     CanClose="False"
                                     CanHide="False"
                                     ContentId="AttendeesDetailsView"
+                                    
                                     ToolTip="Details">
-                                    <Grid Margin="0,10" DataContext="{Binding Mode=OneWay, ElementName=MeetingAttendeesGrid, Path=CurrentItem}" VerticalAlignment="Stretch">
+                                    <Grid IsEnabled="{Binding ZoomService.InMeeting}"
+                                        Margin="0,10" 
+                                        DataContext="{Binding Mode=OneWay, ElementName=MeetingAttendeesGrid, Path=CurrentItem}" 
+                                        VerticalAlignment="Stretch">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition MinWidth="100" Width="Auto" SharedSizeGroup="labels" />
                                             <ColumnDefinition Width="*" MinWidth="150" />
@@ -228,9 +248,19 @@
                                 CanClose="False"
                                 CanHide="False"
                                 CanFloat="False"
+                                CanMove="False"
+                                CanDockAsTabbedDocument="False"
                                 ContentId="VideoView"
                                 ToolTip="Video">
-                                    <Canvas x:Name="VideoCanvas" DataContext="{Binding Mode=OneWay, ElementName=MeetingAttendeesGrid, Path=CurrentItem}" Background="#222222" Height="Auto" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4" VerticalAlignment="Stretch" />
+                                    <Canvas x:Name="VideoCanvas" 
+                                            IsEnabled="{Binding ZoomService.InMeeting}"
+                                            DataContext="{Binding Mode=OneWay, ElementName=MeetingAttendeesGrid, Path=CurrentItem}" 
+                                            Background="#222222" 
+                                            Height="Auto" 
+                                            Grid.Column="0" 
+                                            Grid.ColumnSpan="2" 
+                                            Grid.Row="4" 
+                                            VerticalAlignment="Stretch" />
                                 </LayoutAnchorable>
                             </LayoutAnchorablePane>
                         </LayoutAnchorablePaneGroup>
@@ -259,7 +289,11 @@
             <StatusBarItem Content="{Binding ZoomService.MeetingStatus}"></StatusBarItem>
             <Separator Style="{StaticResource MahApps.Styles.Separator.StatusBar}" />
             <TextBlock Text="{Binding Path=ZoomService.TotalNumberOfPersons, StringFormat='Anzahl Teilnehmer: {0}'}" />
-            <StatusBarItem HorizontalAlignment="Right" Content="{Binding Version}" />
+            <StatusBarItem HorizontalAlignment="Right">
+                <Hyperlink Click="VersionButton_Click" Style="{StaticResource StatusBarHyperLink}">
+                    <TextBlock Text="{Binding Version, Mode=OneWay, StringFormat= 'Version \{0\}'}" />
+                </Hyperlink>
+            </StatusBarItem>
         </StatusBar>
     </Grid>
 

@@ -158,10 +158,8 @@ namespace ZoomJWAssistant.Core
             return t.Task;
         }
 
-        public async Task JoinMeetingAsync(ulong meetingId, string meetingPassword, string userName, Canvas videoCanvas)
+        public void JoinMeeting(ulong meetingId, string meetingPassword, string userName, Canvas videoCanvas)
         {
-            await this.AuthenticateSDK();
-
             JoinParam4WithoutLogin join_api_param = new JoinParam4WithoutLogin();
             join_api_param.meetingNumber = meetingId;
             join_api_param.userName = userName;
@@ -185,6 +183,8 @@ namespace ZoomJWAssistant.Core
             SDKError err = meetingService.Join(param);
             if (SDKError.SDKERR_SUCCESS == err)
             {
+                videoControl = videoCanvas;
+
                 participantsController = meetingService.GetMeetingParticipantsController();
                 participantsController.Add_CB_onHostChangeNotification(HandleHostChanged);
                 participantsController.Add_CB_onCoHostChangeNotification(HandleCoHostChanged);
@@ -196,8 +196,6 @@ namespace ZoomJWAssistant.Core
                 waitingRoomService.Add_CB_onWatingRoomUserLeft(HandleUserLeftWaitingRoom);
 
                 GetAllParticipants().ForEach(Attendees.Add);
-
-                videoControl = videoCanvas;
             }
             else //error handle
             {
@@ -215,9 +213,9 @@ namespace ZoomJWAssistant.Core
                 }
                 else
                 {
-                    Console.WriteLine("Reclaiming Host-Rechte");
-                    participantsController.ReclaimHost();
-                    participantsController.AssignCoHost(MyAttendee.UserId);
+                    Console.WriteLine("Keine Host-Rechte bisher");
+                    //participantsController.ReclaimHost();
+                    //participantsController.AssignCoHost(MyAttendee.UserId);
                 }
             }
         }
@@ -359,7 +357,6 @@ namespace ZoomJWAssistant.Core
                                 }
                                 Attendees.Add(newAttendee);
 
-                                ShowAttendeeVideo(newAttendee);
                                 ApplyRenamings(newAttendee);
                             }
                         }

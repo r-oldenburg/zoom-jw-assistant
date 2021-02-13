@@ -10,6 +10,7 @@ using AvalonDock.Layout;
 using System.Diagnostics;
 using AvalonDock;
 using AutoUpdaterDotNET;
+using ZoomJWAssistant.Core.Threading;
 
 namespace ZoomJWAssistant
 {
@@ -34,49 +35,41 @@ namespace ZoomJWAssistant
 
             consoleOutputter = new TextBoxOutputter(ConsoleTextBox);
             Console.SetOut(consoleOutputter);
+
+            //AutoUpdater.CheckForUpdateEvent += (e) =>
+            //{
+            //    if (e.Error != null)
+            //    {
+            //        Console.WriteLine("Fehler beim Update-Check! " + e.Error.Message);
+            //    }
+            //    AutoUpdater.ShowUpdateForm(e.);
+            //};
         }
 
         protected async override void OnContentRendered(EventArgs e)
         {
+            CheckForUpdate();
+            await ZoomService.AuthenticateSDK();
+        }
+
+        private static void CheckForUpdate()
+        {
+            Console.WriteLine("Überprüfe auf Update für neue Version...");
             AutoUpdater.Start("https://raw.githubusercontent.com/r-oldenburg/zoom-jw-assistant/master/Release.xml");
-
-            var customDialog = new CustomDialog() { Title = "Mit Meeting verbinden" };
-
-            var dataContext = new MeetingInfoContent(async instance =>
-            {
-                await this.HideMetroDialogAsync(customDialog);
-                Properties.Settings.Default.RememberLastMeetingDetails = instance.Remember;
-                Properties.Settings.Default.LastMeetingId = instance.MeetingId;
-                Properties.Settings.Default.LastMeetingPassword = StringCipher.Encrypt(instance.MeetingPassword, instance.MeetingId);
-                Properties.Settings.Default.LastUserName = instance.UserName ?? "JW Admin";
-                if (instance.Remember)
-                {
-                    Properties.Settings.Default.Save();
-                }
-
-                await this.JoinMeetingAsync(instance.MeetingId, instance.MeetingPassword, instance.UserName);
-            }, instance => this.HideMetroDialogAsync(customDialog));
-
-            dataContext.Remember = Properties.Settings.Default.RememberLastMeetingDetails;
-            dataContext.MeetingId = Properties.Settings.Default.LastMeetingId;
-            if (!string.IsNullOrWhiteSpace(dataContext.MeetingId) && !string.IsNullOrWhiteSpace(Properties.Settings.Default.LastMeetingPassword))
-            {
-                dataContext.MeetingPassword = StringCipher.Decrypt(Properties.Settings.Default.LastMeetingPassword, dataContext.MeetingId);
-            }
-            dataContext.UserName = Properties.Settings.Default.LastUserName;
-
-            customDialog.Content = new MeetingInfoDialog { DataContext = dataContext };
-            ((MeetingInfoDialog)customDialog.Content).MeetingPassword.Password = dataContext.MeetingPassword;
-
-            await this.ShowMetroDialogAsync(customDialog);
         }
 
         public async Task JoinMeetingAsync(string meetingId, string meetingPassword, string userName) {
             var controller = await this.ShowProgressAsync("Anmeldung", "Meeting wird verbunden...");
             controller.SetIndeterminate();
-
-            await ZoomService.JoinMeetingAsync(ulong.Parse(meetingId.Trim().Replace(" ", "")), meetingPassword, userName, this.VideoCanvas);
-
+            controller.SetCancelable(true);
+            controller.Canceled += (e, s) => {
+                ZoomService.LeaveMeeting();
+            };
+            ZoomService.JoinMeeting(ulong.Parse(meetingId.Trim().Replace(" ", "")), meetingPassword, userName, this.VideoCanvas);
+            await TaskEx.WaitUntil(() => {
+                controller.SetMessage(ZoomConstants.MeetingStatusDecoder(ZoomService.MeetingStatus));
+                return controller.IsCanceled || ZoomService.InMeeting;
+            });
             await controller.CloseAsync();
         }
 
@@ -132,6 +125,46 @@ namespace ZoomJWAssistant
         private void ToggleButton_Click(object sender, RoutedEventArgs e)
         {
             ZoomService.ToggleHost();
+        }
+
+        private void VersionButton_Click(object sender, RoutedEventArgs e)
+        {
+            AutoUpdater.ReportErrors = true;
+            CheckForUpdate();
+        }
+
+        private void JoinButton_Click(object sender, RoutedEventArgs e)
+        {
+            var customDialog = new CustomDialog() { Title = "Mit Meeting verbinden" };
+
+            var dataContext = new MeetingInfoContent(async instance =>
+            {
+                await this.HideMetroDialogAsync(customDialog);
+
+                Properties.Settings.Default.RememberLastMeetingDetails = instance.Remember;
+                Properties.Settings.Default.LastMeetingId = instance.MeetingId;
+                Properties.Settings.Default.LastMeetingPassword = StringCipher.Encrypt(instance.MeetingPassword, instance.MeetingId);
+                Properties.Settings.Default.LastUserName = instance.UserName ?? "JW Admin";
+                if (instance.Remember)
+                {
+                    Properties.Settings.Default.Save();
+                }
+
+                await this.JoinMeetingAsync(instance.MeetingId, instance.MeetingPassword, instance.UserName);
+            }, instance => this.HideMetroDialogAsync(customDialog));
+
+            dataContext.Remember = Properties.Settings.Default.RememberLastMeetingDetails;
+            dataContext.MeetingId = Properties.Settings.Default.LastMeetingId;
+            if (!string.IsNullOrWhiteSpace(dataContext.MeetingId) && !string.IsNullOrWhiteSpace(Properties.Settings.Default.LastMeetingPassword))
+            {
+                dataContext.MeetingPassword = StringCipher.Decrypt(Properties.Settings.Default.LastMeetingPassword, dataContext.MeetingId);
+            }
+            dataContext.UserName = string.IsNullOrWhiteSpace(Properties.Settings.Default.LastUserName) ? "JW Admin" : Properties.Settings.Default.LastUserName;
+
+            customDialog.Content = new MeetingInfoDialog { DataContext = dataContext };
+            ((MeetingInfoDialog)customDialog.Content).MeetingPassword.Password = dataContext.MeetingPassword;
+
+            this.ShowMetroDialogAsync(customDialog);
         }
     }
 }
