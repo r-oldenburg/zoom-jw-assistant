@@ -2,6 +2,6 @@
 <item>
     <version>1.0.1.0</version>
     <url>https://github.com/r-oldenburg/zoom-jw-assistant/releases/download/latest/ZoomJWAssistant.zip</url>
-    <changelog>https://github.com/r-oldenburg/zoom-jw-assistant/releases</changelog>
+    <changelog>https://github.com/r-oldenburg/zoom-jw-assistant/releases/tag/latest</changelog>
     <mandatory>false</mandatory>
 </item>
