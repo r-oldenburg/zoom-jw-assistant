@@ -324,6 +324,7 @@ namespace ZoomJWAssistant.Core
                     }
                     Attendees.Add(newAttendee);
 
+                    AcceptKnownAttendeeWaiting(newAttendee);
                     ApplyRenamings(newAttendee);
                 }
             }
@@ -381,18 +382,26 @@ namespace ZoomJWAssistant.Core
             var rename = this._defaultRenames.FirstOrDefault(x => x.fromName.Equals(attendee.Name));
             if (rename != null)
             {
-                if (attendee.IsWaiting)
-                {
-                    Console.WriteLine("-> wird automatisch aus Warteraum zugelassen");
-                    waitingRoomService.AdmitToMeeting(attendee.UserId);
-                }
                 Console.WriteLine("-> wird umbenannt zu " + rename.toName);
-                if (MeetingAttendee.NameRegEx.IsMatch(rename.toName))
+                if (MeetingAttendee.IsNameWithNumber(rename.toName))
                 {
                     attendee.CurrentTechnicalName = rename.toName;
                 } else
                 {
                     attendee.Name = rename.toName;
+                }
+            }
+        }
+
+        private void AcceptKnownAttendeeWaiting(MeetingAttendee attendee)
+        {
+            var rename = this._defaultRenames.FirstOrDefault(x => x.fromName.Equals(attendee.Name) || x.toName.Equals(attendee.Name));
+            if (rename != null)
+            {
+                if (attendee.IsWaiting)
+                {
+                    Console.WriteLine("-> wird automatisch aus Warteraum zugelassen");
+                    waitingRoomService.AdmitToMeeting(attendee.UserId);
                 }
             }
         }
@@ -408,6 +417,7 @@ namespace ZoomJWAssistant.Core
             {
                 if (IsStillInMeeting(attendee.UserId))
                 {
+                    AcceptKnownAttendeeWaiting(attendee);
                     ApplyRenamings(attendee);
                 }
             }

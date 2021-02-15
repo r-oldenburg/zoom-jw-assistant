@@ -11,6 +11,10 @@ using System.Diagnostics;
 using AvalonDock;
 using AutoUpdaterDotNET;
 using ZoomJWAssistant.Core.Threading;
+using System.Windows.Input;
+using System.Windows.Controls;
+using System.Windows.Threading;
+using System.Configuration;
 
 namespace ZoomJWAssistant
 {
@@ -49,7 +53,60 @@ namespace ZoomJWAssistant
         protected async override void OnContentRendered(EventArgs e)
         {
             CheckForUpdate();
-            await ZoomService.AuthenticateSDK();
+            await CheckForSdkKeyData();
+            try
+            {
+                await ZoomService.AuthenticateSDK();
+                JoinMeeting();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Probleme beim Initialisieren des Zoom SDK! " + ex.Message);
+            }
+        }
+
+        private async Task CheckForSdkKeyData()
+        {
+            var sdkKey = Environment.ExpandEnvironmentVariables(ConfigurationManager.AppSettings["sdkKey"]);
+            var sdkSecret = Environment.ExpandEnvironmentVariables(ConfigurationManager.AppSettings["sdkSecret"]);
+
+            if (string.IsNullOrWhiteSpace(sdkKey) || sdkKey.Contains("%ZOOM"))
+            {
+                sdkKey = Properties.Settings.Default.sdkKey;
+                if (!string.IsNullOrWhiteSpace(sdkKey))
+                {
+                    ConfigurationManager.AppSettings["sdkKey"] = sdkKey;
+                }
+                else
+                {
+                    var result = await this.ShowInputAsync("SDK Key", "Bitte den SDK Key eingeben");
+                    if (result != null) //user pressed cancel
+                    {
+                        ConfigurationManager.AppSettings["sdkKey"] = result;
+                        Properties.Settings.Default.sdkKey = result;
+                        Properties.Settings.Default.Save();
+                    }
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(sdkSecret) || sdkSecret.Contains("%ZOOM"))
+            {
+                sdkSecret = Properties.Settings.Default.sdkSecret;
+                if (!string.IsNullOrWhiteSpace(sdkSecret))
+                {
+                    ConfigurationManager.AppSettings["sdkSecret"] = sdkSecret;
+                }
+                else
+                {
+                    var result = await this.ShowInputAsync("SDK Secret", "Bitte das SDK Secret eingeben");
+                    if (result != null) //user pressed cancel
+                    {
+                        ConfigurationManager.AppSettings["sdkSecret"] = result;
+                        Properties.Settings.Default.sdkSecret = result;
+                        Properties.Settings.Default.Save();
+                    }
+                }
+            }
         }
 
         private static void CheckForUpdate()
@@ -135,18 +192,23 @@ namespace ZoomJWAssistant
 
         private void JoinButton_Click(object sender, RoutedEventArgs e)
         {
+            JoinMeeting();
+        }
+
+        private void JoinMeeting()
+        {
             var customDialog = new CustomDialog() { Title = "Mit Meeting verbinden" };
 
             var dataContext = new MeetingInfoContent(async instance =>
             {
                 await this.HideMetroDialogAsync(customDialog);
 
-                Properties.Settings.Default.RememberLastMeetingDetails = instance.Remember;
-                Properties.Settings.Default.LastMeetingId = instance.MeetingId;
-                Properties.Settings.Default.LastMeetingPassword = StringCipher.Encrypt(instance.MeetingPassword, instance.MeetingId);
-                Properties.Settings.Default.LastUserName = instance.UserName ?? "JW Admin";
                 if (instance.Remember)
                 {
+                    Properties.Settings.Default.RememberLastMeetingDetails = instance.Remember;
+                    Properties.Settings.Default.LastMeetingId = instance.MeetingId;
+                    Properties.Settings.Default.LastMeetingPassword = StringCipher.Encrypt(instance.MeetingPassword, instance.MeetingId);
+                    Properties.Settings.Default.LastUserName = instance.UserName ?? "JW Admin";
                     Properties.Settings.Default.Save();
                 }
 
@@ -164,7 +226,17 @@ namespace ZoomJWAssistant
             customDialog.Content = new MeetingInfoDialog { DataContext = dataContext };
             ((MeetingInfoDialog)customDialog.Content).MeetingPassword.Password = dataContext.MeetingPassword;
 
-            this.ShowMetroDialogAsync(customDialog);
+            this.ShowMetroDialogAsync(customDialog).ContinueWith((e) =>
+            {
+                TextBox textBox = customDialog.FindChild<TextBox>("MeetingIdTextBox");
+                Dispatcher.BeginInvoke(DispatcherPriority.Input,
+                    new Action(delegate () {
+                    Keyboard.ClearFocus();
+                    textBox.Focus();
+                    Keyboard.Focus(textBox);
+                }));
+            });
+
         }
     }
 }

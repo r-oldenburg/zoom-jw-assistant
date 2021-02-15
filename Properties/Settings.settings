@@ -17,5 +17,14 @@
     <Setting Name="LastMeetingPassword" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="NameFormat" Type="System.String" Scope="User">
+      <Value Profile="(Default)">{name} - {number}</Value>
+    </Setting>
+    <Setting Name="sdkKey" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="sdkSecret" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

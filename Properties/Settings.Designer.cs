@@ -82,5 +82,41 @@ namespace ZoomJWAssistant.Properties {
                 this["LastMeetingPassword"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("{name} - {number}")]
+        public string NameFormat {
+            get {
+                return ((string)(this["NameFormat"]));
+            }
+            set {
+                this["NameFormat"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string sdkKey {
+            get {
+                return ((string)(this["sdkKey"]));
+            }
+            set {
+                this["sdkKey"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string sdkSecret {
+            get {
+                return ((string)(this["sdkSecret"]));
+            }
+            set {
+                this["sdkSecret"] = value;
+            }
+        }
     }
 }

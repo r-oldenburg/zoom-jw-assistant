@@ -13,7 +13,8 @@ namespace ZoomJWAssistant.Models
 {
     public class MeetingAttendee : ViewModelBase
     {
-        public static Regex NameRegEx = new Regex(@"^[^a-zA-Z0-9\s]*(\d)[^a-zA-Z0-9\s]*[\s-_/]+(.*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        public static Regex NameNumberRegEx = new Regex(@"^\s*[^a-zA-Z0-9\s]*\s*(\d)\s*[^a-zA-Z0-9\s]*[\s-_/]*(.*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        public static Regex NameNumberAtTheEndRegEx = new Regex(@"(.*?)\s*[^a-zA-Z0-9\s]*\s*(\d)\s*[^a-zA-Z0-9\s]*[\s-_/]*", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private uint _userId;
         private string _name;
@@ -185,9 +186,9 @@ namespace ZoomJWAssistant.Models
         private void GenerateNewTechnicalName()
         {
             var newTechnicalName = Name;
-            if (NumberOfPersons != 1 && newTechnicalName != null && newTechnicalName.Trim().Length > 0)
+            if (NumberOfPersons != 1 && !string.IsNullOrWhiteSpace(newTechnicalName))
             {
-                newTechnicalName = "(" + NumberOfPersons + ") " + newTechnicalName;
+                newTechnicalName = FormatTechnicalName(Name, NumberOfPersons);
             }
             if (!EqualityComparer<string>.Default.Equals(_currentTechnicalName, newTechnicalName) && newTechnicalName != null) 
             {
@@ -198,21 +199,41 @@ namespace ZoomJWAssistant.Models
 
         private void ProcessNewIncomingName(string newName)
         {
-            var match = NameRegEx.Match(newName);
+            _numberOfPersons = 1;
+            _name = newName;
+
+            var match = NameNumberRegEx.Match(newName);
             if (match.Success)
             {
                 _numberOfPersons = int.Parse(match.Groups[1].Value);
                 _name = match.Groups[2].Value;
-            } else
+            }
+            else
             {
-                _numberOfPersons = 1;
-                _name = newName;
+                match = NameNumberAtTheEndRegEx.Match(newName);
+                if (match.Success)
+                {
+                    _name = match.Groups[1].Value;
+                    _numberOfPersons = int.Parse(match.Groups[2].Value);
+                }
             }
 
             OnPropertyChanged(nameof(Name));
             OnPropertyChanged(nameof(NumberOfPersons));
 
             this.GenerateNewTechnicalName();
+        }
+
+        public static bool IsNameWithNumber(string name)
+        {
+            return NameNumberRegEx.IsMatch(name) || NameNumberAtTheEndRegEx.IsMatch(name);
+        }
+
+        private static string FormatTechnicalName(string name, int numberOfPersons)
+        {
+            var formatString = Properties.Settings.Default.NameFormat ?? "{name} - {number}";
+            formatString = formatString.Replace("{name}", "{0}").Replace("{number}", "{1}");
+            return string.Format(formatString, name, numberOfPersons);
         }
 
         public enum StateEnum
