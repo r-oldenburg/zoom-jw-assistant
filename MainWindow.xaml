@@ -112,6 +112,11 @@
                                         SelectionUnit="FullRow"
                                         CanUserAddRows="false"
                                         VirtualizingPanel.IsVirtualizingWhenGrouping="False">
+                                        <DataGrid.InputBindings>
+                                            <KeyBinding Key="Left" Command="{Binding DecreaseNumberOfPersonsCommand}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                                            <KeyBinding Key="Right" Command="{Binding IncreaseNumberOfPersonsCommand}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                                            <KeyBinding Key="Return" Command="{Binding EditDataGridCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                                        </DataGrid.InputBindings>
                                         <DataGrid.Columns>
                                             <DataGridCheckBoxColumn Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=IsSelected, Mode=OneWay}" Header="" Width="Auto"/>
                                             <DataGridTemplateColumn Header="Typ" IsReadOnly="True" Width="Auto">

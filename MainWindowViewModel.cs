@@ -17,6 +17,7 @@ using NHotkey;
 using NHotkey.Wpf;
 using System.Windows.Data;
 using ZoomJWAssistant.Models;
+using System.Windows.Controls;
 
 namespace ZoomJWAssistant
 {
@@ -74,6 +75,47 @@ namespace ZoomJWAssistant
         {
             get => this.numericUpDownValue;
             set => this.Set(ref this.numericUpDownValue, value);
+        }
+
+        private ICommand increaseNumberOfPersonsCommand = new SimpleCommand(
+            (e) => e as MeetingAttendee != null,
+            (e) => (e as MeetingAttendee).NumberOfPersons++
+        );
+
+        public ICommand IncreaseNumberOfPersonsCommand
+        {
+            get => this.increaseNumberOfPersonsCommand;
+        }
+
+        private ICommand decreaseNumberOfPersonsCommand = new SimpleCommand(
+            (e) => e as MeetingAttendee != null,
+            (e) => (e as MeetingAttendee).NumberOfPersons = Math.Max(0, (e as MeetingAttendee).NumberOfPersons-1)
+        );
+
+        public ICommand DecreaseNumberOfPersonsCommand
+        {
+            get => this.decreaseNumberOfPersonsCommand;
+        }
+
+        private ICommand editDataGridCommand = new SimpleCommand(
+            (e) => e as DataGrid != null,
+            (e) => {
+                var grid = e as DataGrid;
+                if (((IEditableCollectionView)grid.Items).IsEditingItem)
+                {
+                    grid.CommitEdit(DataGridEditingUnit.Row, true);
+                }
+                else
+                {
+                    grid.CurrentColumn = grid.Columns.First((c) => !c.IsReadOnly && c.GetType() == typeof(DataGridTextColumn));
+                    grid.BeginEdit(); 
+                }
+            }
+        );
+
+        public ICommand EditDataGridCommand
+        {
+            get => this.editDataGridCommand;
         }
 
         public ICommand CloseCmd { get; }
