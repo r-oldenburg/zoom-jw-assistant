@@ -165,10 +165,12 @@
                                                 </GroupStyle.HeaderTemplate>
                                             </GroupStyle>
                                         </DataGrid.GroupStyle>
+                                            -->
+                                                    <!-- 
                                         <DataGrid.RowStyle>
                                             <Style BasedOn="{StaticResource MahApps.Styles.DataGridRow}" TargetType="{x:Type DataGridRow}">
                                                 <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Price, Mode=OneWay}" Value="True">
+                                                    <DataTrigger Binding="{Binding IsWaiting, Mode=OneWay}" Value="True">
                                                         <Setter Property="Background" Value="#FF8B8B" />
                                                         <Setter Property="Foreground" Value="DarkRed" />
                                                     </DataTrigger>
@@ -181,7 +183,7 @@
                                                 </Style.Triggers>
                                             </Style>
                                         </DataGrid.RowStyle>
-                                            -->
+                                                    -->
                                         <DataGrid.Style>
                                             <Style BasedOn="{StaticResource MahApps.Styles.DataGrid}" TargetType="{x:Type DataGrid}">
                                                 <Setter Property="AlternatingRowBackground" Value="{DynamicResource MahApps.Brushes.Gray10}" />

@@ -13,8 +13,8 @@ namespace ZoomJWAssistant.Models
 {
     public class MeetingAttendee : ViewModelBase
     {
-        public static Regex NameNumberRegEx = new Regex(@"^\s*[^a-zA-Z0-9\s]*\s*(\d)\s*[^a-zA-Z0-9\s]*[\s-_/]*(.*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        public static Regex NameNumberAtTheEndRegEx = new Regex(@"(.*?)\s*[^a-zA-Z0-9\s]*\s*(\d)\s*[^a-zA-Z0-9\s]*[\s-_/]*", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        public static Regex NameNumberRegEx = new Regex(@"^\s*[^a-zA-Z0-9\s]*\s*(\d)\s*[^a-zA-Z0-9\s]*[\s-_/]*(.*[^0-9]+.*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        public static Regex NameNumberAtTheEndRegEx = new Regex(@"(.*?[^0-9]+.*?)\s*[^a-zA-Z0-9\s]*\s*(\d)\s*[^a-zA-Z0-9\s]*[\s-_/]*", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private uint _userId;
         private string _name;
@@ -208,15 +208,15 @@ namespace ZoomJWAssistant.Models
                 _numberOfPersons = int.Parse(match.Groups[1].Value);
                 _name = match.Groups[2].Value;
             }
-            else
-            {
-                match = NameNumberAtTheEndRegEx.Match(newName);
-                if (match.Success)
-                {
-                    _name = match.Groups[1].Value;
-                    _numberOfPersons = int.Parse(match.Groups[2].Value);
-                }
-            }
+            //else
+            //{
+            //    match = NameNumberAtTheEndRegEx.Match(newName);
+            //    if (match.Success)
+            //    {
+            //        _name = match.Groups[1].Value;
+            //        _numberOfPersons = int.Parse(match.Groups[2].Value);
+            //    }
+            //}
 
             OnPropertyChanged(nameof(Name));
             OnPropertyChanged(nameof(NumberOfPersons));

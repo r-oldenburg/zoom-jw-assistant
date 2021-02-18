@@ -1,12 +1,12 @@
 ﻿https://jsonbin.io/api-reference/bins/create
 
 OK key shortcuts im grid (enter, esc, plus, minus, pfeiltasten)
+ - Warteraum-Teilnehmer anders darstellen (Manuelles Eintretenlassen ermöglichen)
  - Layout-Anordnung dockpanel speichern bei schließen
- - Neue View: Grid mit "Known Members" und Aliase
+ - "Known Members" und Aliase, anstatt Umbenennung (zuerst Text-View mit Separator? Dann Neue View: Grid?)
  - Richtiges Logging (https://github.com/woanware/LogViewer2, https://github.com/codeaphex/SerilogViewer)
  - Über Dialog
  - Thread Dispatching als queue mit Debouncing
- - Warteraum-Teilnehmer anders darstellen (Manuelles Eintretenlassen ermöglichen)
  - Settings-Seite (Teilnehmer gemäß Liste umbenennen, Automatisch eintreten lassen, Namensformat, Namensformat erzwingen?)
  - Video ein/aus
  - Verschlüsseltes Hoch/Runterladen der Teilnehmerliste (https://ed-von-schleck.github.io/shoco/#quick-start //jsonbin.io/api https://stackoverflow.com/questions/845623/whats-the-best-way-to-encrypt-short-strings-in-net/845632)
