@@ -1,6 +1,7 @@
 ﻿https://jsonbin.io/api-reference/bins/create
 
 OK key shortcuts im grid (enter, esc, plus, minus, pfeiltasten)
+ - Layout-Anordnung dockpanel speichern bei schließen
  - Neue View: Grid mit "Known Members" und Aliase
  - Richtiges Logging (https://github.com/woanware/LogViewer2, https://github.com/codeaphex/SerilogViewer)
  - Über Dialog
