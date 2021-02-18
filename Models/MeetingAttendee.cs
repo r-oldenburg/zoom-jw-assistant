@@ -13,8 +13,8 @@ namespace ZoomJWAssistant.Models
 {
     public class MeetingAttendee : ViewModelBase
     {
-        public static Regex NameNumberRegEx = new Regex(@"^\s*[^a-zA-Z0-9\s]*\s*(\d)\s*[^a-zA-Z0-9\s]*[\s-_/]*(.*[^0-9]+.*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        public static Regex NameNumberAtTheEndRegEx = new Regex(@"(.*?[^0-9]+.*?)\s*[^a-zA-Z0-9\s]*\s*(\d)\s*[^a-zA-Z0-9\s]*[\s-_/]*", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        public static Regex NameNumberRegEx = new Regex(@"^\s*[^a-zA-Z0-9\s]*\s*(\d)\s*[^a-zA-Z0-9\s]*[\s-_/]*([^0-9]+.*)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        public static Regex NameNumberAtTheEndRegEx = new Regex(@"^(.*?[^0-9\s]+?.*?)\s*[^a-zA-Z0-9\s]*\s*(\d)\s*[^a-zA-Z0-9\s]*$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private uint _userId;
         private string _name;
@@ -202,21 +202,25 @@ namespace ZoomJWAssistant.Models
             _numberOfPersons = 1;
             _name = newName;
 
-            var match = NameNumberRegEx.Match(newName);
-            if (match.Success)
+            if (!newName.StartsWith("Call-In User"))
             {
-                _numberOfPersons = int.Parse(match.Groups[1].Value);
-                _name = match.Groups[2].Value;
+                var match = NameNumberRegEx.Match(newName);
+                if (match.Success)
+                {
+                    _numberOfPersons = int.Parse(match.Groups[1].Value);
+                    _name = match.Groups[2].Value;
+                }
+                else
+                {
+                    match = NameNumberAtTheEndRegEx.Match(newName);
+                    if (match.Success)
+                    {
+                        _name = match.Groups[1].Value;
+                        if (_name.EndsWith(" - ")) _name = _name.Substring(0, _name.Length - 3);
+                        _numberOfPersons = int.Parse(match.Groups[2].Value);
+                    }
+                }
             }
-            //else
-            //{
-            //    match = NameNumberAtTheEndRegEx.Match(newName);
-            //    if (match.Success)
-            //    {
-            //        _name = match.Groups[1].Value;
-            //        _numberOfPersons = int.Parse(match.Groups[2].Value);
-            //    }
-            //}
 
             OnPropertyChanged(nameof(Name));
             OnPropertyChanged(nameof(NumberOfPersons));

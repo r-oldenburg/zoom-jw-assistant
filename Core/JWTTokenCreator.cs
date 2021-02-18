@@ -39,7 +39,9 @@ namespace ZoomJWAssistant.Core
             var handler = new JwtSecurityTokenHandler();
 
             // Token to String so you can use it in your client
-            return handler.WriteToken(secToken);
+            var token = handler.WriteToken(secToken);
+            //Console.WriteLine("TOKEN: " + token);
+            return token;
         }
 
     }

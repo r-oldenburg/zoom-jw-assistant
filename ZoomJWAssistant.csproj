@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="packages\NUnit.3.13.1\build\NUnit.props" Condition="Exists('packages\NUnit.3.13.1\build\NUnit.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -15,6 +16,8 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
     <IsWebBootstrapper>true</IsWebBootstrapper>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
@@ -28,8 +31,8 @@
     <InstallUrl>https://github.com/r-oldenburg/zoom-jw-assistant/releases/</InstallUrl>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>13</ApplicationRevision>
-    <ApplicationVersion>0.5.0.%2a</ApplicationVersion>
+    <ApplicationRevision>4</ApplicationRevision>
+    <ApplicationVersion>1.0.1.4</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
@@ -112,6 +115,9 @@
     <Reference Include="NHotkey.Wpf, Version=2.0.0.0, Culture=neutral, PublicKeyToken=a76ffb086700b11c, processorArchitecture=MSIL">
       <HintPath>packages\NHotkey.Wpf.2.1.0\lib\net45\NHotkey.Wpf.dll</HintPath>
     </Reference>
+    <Reference Include="nunit.framework, Version=3.13.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>packages\NUnit.3.13.1\lib\net45\nunit.framework.dll</HintPath>
+    </Reference>
     <Reference Include="Svg2Xaml, Version=0.3.0.7, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Svg2Xaml.0.3.0.7\lib\net40\Svg2Xaml.dll</HintPath>
     </Reference>
@@ -157,6 +163,7 @@
     <Compile Include="Core\ZoomConstants.cs" />
     <Compile Include="Core\ZoomService.cs" />
     <Compile Include="Models\MeetingAttendeeRename.cs" />
+    <Compile Include="Test\MeetingAttendeeTest.cs" />
     <Compile Include="Test\TestData.cs" />
     <Compile Include="ValueConverter\AttendeeStateToImageConverter.cs" />
     <Compile Include="ValueConverter\AttendeeToImageConverter.cs" />
@@ -272,6 +279,16 @@
     <Folder Include="zoom-c-sharp-wrapper\bin\" />
   </ItemGroup>
   <ItemGroup>
+    <PublishFile Include="nunit.framework">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Exclude</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>Assembly</FileType>
+    </PublishFile>
     <PublishFile Include="zoom_sdk_dotnet_wrap.dll">
       <Visible>False</Visible>
       <Group>
@@ -292,4 +309,10 @@
     <PreBuildEvent>
     </PreBuildEvent>
   </PropertyGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\NUnit.3.13.1\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\NUnit.3.13.1\build\NUnit.props'))" />
+  </Target>
 </Project>
