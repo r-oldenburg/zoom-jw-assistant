@@ -16,8 +16,8 @@
                  GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
                  Icon="resources\Icon7.ico"
                  ShowIconOnTitleBar="True"
-                 ShowTitleBar="{Binding ShowMyTitleBar, Mode=TwoWay}"
                  WindowStartupLocation="CenterScreen"
+                 SourceInitialized="MetroWindow_OnSourceInitialized"
                  Closing="MetroWindow_Closing"
                  mc:Ignorable="d">
     <Window.Resources>
@@ -39,6 +39,12 @@
             <vc:BooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter" True="Collapsed" False="Visible" />
         </ResourceDictionary>
     </Window.Resources>
+
+    <mah:MetroWindow.LeftWindowCommands>
+        <mah:WindowCommands>
+            <ToggleButton Click="ResetLayoutButton_Click" Content="Reset Layout" />
+        </mah:WindowCommands>
+    </mah:MetroWindow.LeftWindowCommands>
 
     <mah:MetroWindow.RightWindowCommands>
         <mah:WindowCommands>

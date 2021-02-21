@@ -15,6 +15,10 @@ using System.Windows.Input;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using System.Configuration;
+using AvalonDock.Layout.Serialization;
+using System.IO;
+using System.IO.Compression;
+using System.Text;
 
 namespace ZoomJWAssistant
 {
@@ -29,6 +33,7 @@ namespace ZoomJWAssistant
         private readonly MainWindowViewModel _viewModel;
 
         TextBoxOutputter consoleOutputter;
+        private byte[] DefaultDockLayoutSerialized;
 
         public MainWindow()
         {
@@ -62,6 +67,43 @@ namespace ZoomJWAssistant
             catch (Exception ex)
             {
                 Console.WriteLine("Probleme beim Initialisieren des Zoom SDK! " + ex.Message);
+            }
+        }
+
+        private void MetroWindow_OnSourceInitialized(object sender, EventArgs e)
+        {
+            var monitorSize = this.GetMonitorWorkSize();
+            if ((Properties.Settings.Default.Left + Properties.Settings.Default.Width) >= 1.0d || 
+                monitorSize.Width >= (Properties.Settings.Default.Left + Properties.Settings.Default.Width))
+            {
+                this.Top = Properties.Settings.Default.Top;
+                this.Left = Properties.Settings.Default.Left;
+                this.Height = Properties.Settings.Default.Height;
+                this.Width = Properties.Settings.Default.Width;
+                // Very quick and dirty - but it does the job
+                if (Properties.Settings.Default.Maximized)
+                {
+                    WindowState = WindowState.Maximized;
+                }
+            }
+
+            KeepCurrentDockLayout();
+
+            if (!string.IsNullOrEmpty(Properties.Settings.Default.DockLayout))
+            {
+                try
+                {
+                    MemoryStream mem = new MemoryStream(System.Convert.FromBase64String(Properties.Settings.Default.DockLayout));
+                    using (GZipStream gz = new GZipStream(mem, CompressionMode.Decompress, false))
+                    using (var reader = new StreamReader(gz))
+                    {
+                        new XmlLayoutSerializer(this.dockManager).Deserialize(reader);
+                    }
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("Kein zuvor gespeichertes Layout wiederhergestellt");
+                }
             }
         }
 
@@ -149,12 +191,74 @@ namespace ZoomJWAssistant
         {
             ZoomService.Instance.Shutdown();
 
+            SaveWindowLayout();
+            SaveDockLayout();
+
             if (e.Cancel)
             {
                 return;
             }
 
             _viewModel.Dispose();
+        }
+
+        private void SaveDockLayout()
+        {
+            MemoryStream mem = new MemoryStream();
+            using (mem)
+            using (GZipStream gz = new GZipStream(mem, CompressionMode.Compress, false))
+            using (var writer = new StreamWriter(gz))
+            {
+                new XmlLayoutSerializer(this.dockManager).Serialize(writer);
+            }
+
+            // after usings have closed the streams, otherwise error on decompression
+            Properties.Settings.Default.DockLayout = Convert.ToBase64String(mem.ToArray());
+            Properties.Settings.Default.Save();
+        }
+
+        private void KeepCurrentDockLayout()
+        {
+            MemoryStream mem = new MemoryStream();
+            using (mem)
+            using (var writer = new StreamWriter(mem))
+            {
+                new XmlLayoutSerializer(this.dockManager).Serialize(writer);
+            }
+
+            // after usings have closed the streams, otherwise error on decompression
+            this.DefaultDockLayoutSerialized = mem.ToArray();
+        }
+
+        private void RestoreDefaultDockLayout()
+        {
+            using (var mem = new MemoryStream(this.DefaultDockLayoutSerialized))
+            using (var reader = new StreamReader(mem))
+            {
+                new XmlLayoutSerializer(this.dockManager).Deserialize(reader);
+            }
+        }
+
+        private void SaveWindowLayout()
+        {
+            if (WindowState == WindowState.Maximized)
+            {
+                // Use the RestoreBounds as the current values will be 0, 0 and the size of the screen
+                Properties.Settings.Default.Top = RestoreBounds.Top;
+                Properties.Settings.Default.Left = RestoreBounds.Left;
+                Properties.Settings.Default.Height = RestoreBounds.Height;
+                Properties.Settings.Default.Width = RestoreBounds.Width;
+                Properties.Settings.Default.Maximized = true;
+            }
+            else
+            {
+                Properties.Settings.Default.Top = this.Top;
+                Properties.Settings.Default.Left = this.Left;
+                Properties.Settings.Default.Height = this.Height;
+                Properties.Settings.Default.Width = this.Width;
+                Properties.Settings.Default.Maximized = false;
+            }
+            Properties.Settings.Default.Save();
         }
 
         private async Task ConfirmShutdown()
@@ -177,6 +281,11 @@ namespace ZoomJWAssistant
             {
                 Application.Current.Shutdown();
             }
+        }
+
+        private void ResetLayoutButton_Click(object sender, RoutedEventArgs e)
+        {
+            RestoreDefaultDockLayout();
         }
 
         private void ToggleButton_Click(object sender, RoutedEventArgs e)

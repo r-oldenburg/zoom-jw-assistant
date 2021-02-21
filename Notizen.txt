@@ -1,6 +1,8 @@
 ﻿https://jsonbin.io/api-reference/bins/create
 
 OK key shortcuts im grid (enter, esc, plus, minus, pfeiltasten)
+ - Unterscheiden: Programmteilnehmer
+ - Automatisches Stummhalten, solagne keine Meldung (wenn nicht Programmteilnehmer)
  - Warteraum-Teilnehmer anders darstellen (Manuelles Eintretenlassen ermöglichen)
  - Layout-Anordnung dockpanel speichern bei schließen
  - "Known Members" und Aliase, anstatt Umbenennung (zuerst Text-View mit Separator? Dann Neue View: Grid?)
