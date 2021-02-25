@@ -19,6 +19,7 @@ using AvalonDock.Layout.Serialization;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
+using ZoomJWAssistant.Update;
 
 namespace ZoomJWAssistant
 {
@@ -72,9 +73,11 @@ namespace ZoomJWAssistant
 
         private void MetroWindow_OnSourceInitialized(object sender, EventArgs e)
         {
-            var monitorSize = this.GetMonitorWorkSize();
-            if ((Properties.Settings.Default.Left + Properties.Settings.Default.Width) >= 1.0d || 
-                monitorSize.Width >= (Properties.Settings.Default.Left + Properties.Settings.Default.Width))
+            var rightEdge = (Properties.Settings.Default.Left + Properties.Settings.Default.Width);
+            var bottomEdge = (Properties.Settings.Default.Top + Properties.Settings.Default.Height);
+
+            if (rightEdge >= 1.0d && rightEdge <= SystemParameters.VirtualScreenWidth &&
+                bottomEdge >= 1.0d && bottomEdge <= SystemParameters.VirtualScreenHeight)
             {
                 this.Top = Properties.Settings.Default.Top;
                 this.Left = Properties.Settings.Default.Left;
@@ -154,7 +157,9 @@ namespace ZoomJWAssistant
         private static void CheckForUpdate()
         {
             Console.WriteLine("Überprüfe auf Update für neue Version...");
-            AutoUpdater.Start("https://raw.githubusercontent.com/r-oldenburg/zoom-jw-assistant/master/Release.xml");
+            AutoUpdater.HttpUserAgent = "AutoUpdater";
+            AutoUpdater.ParseUpdateInfoEvent += ParseGithubUpdateInfoHandler.ParseUpdateInfoHandler;
+            AutoUpdater.Start("https://api.github.com/repos/r-oldenburg/zoom-jw-assistant/releases/latest");
         }
 
         public async Task JoinMeetingAsync(string meetingId, string meetingPassword, string userName) {

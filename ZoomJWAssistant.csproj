@@ -109,6 +109,9 @@
     <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Xaml.Behaviors.Wpf.1.1.19\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="NHotkey, Version=2.0.0.0, Culture=neutral, PublicKeyToken=a76ffb086700b11c, processorArchitecture=MSIL">
       <HintPath>packages\NHotkey.2.1.0\lib\net45\NHotkey.dll</HintPath>
     </Reference>
@@ -163,8 +166,10 @@
     <Compile Include="Core\ZoomConstants.cs" />
     <Compile Include="Core\ZoomService.cs" />
     <Compile Include="Models\MeetingAttendeeRename.cs" />
+    <Compile Include="Test\ParseGithubUpdateInfoHandlerTest.cs" />
     <Compile Include="Test\MeetingAttendeeTest.cs" />
     <Compile Include="Test\TestData.cs" />
+    <Compile Include="Update\ParseGithubUpdateInfoHandler.cs" />
     <Compile Include="ValueConverter\AttendeeStateToImageConverter.cs" />
     <Compile Include="ValueConverter\AttendeeToImageConverter.cs" />
     <Compile Include="ValueConverter\BooleanConverter.cs" />
@@ -232,6 +237,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <None Include="Resources\jw-zoom-icon.icl" />
+    <None Include="Test\test-response-release.json" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
