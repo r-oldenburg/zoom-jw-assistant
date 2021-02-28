@@ -1,19 +1,19 @@
 ﻿https://jsonbin.io/api-reference/bins/create
 
-OK key shortcuts im grid (enter, esc, plus, minus, pfeiltasten)
-OK Unterscheiden: Programmteilnehmer
-OK Sondernamen korrekt erkennen
+ - Warteraum-Teilnehmer manuell eintreten lassen
  - Verschlüsseltes Hoch/Runterladen der Teilnehmerliste (https://ed-von-schleck.github.io/shoco/#quick-start //jsonbin.io/api https://stackoverflow.com/questions/845623/whats-the-best-way-to-encrypt-short-strings-in-net/845632)
  - Wiederverwenden Attendee aus Warteraum
- - Automatisches Stummhalten, solagne keine Meldung (wenn nicht Programmteilnehmer)
- - Warteraum-Teilnehmer anders darstellen (Manuelles Eintretenlassen ermöglichen)
-OK Layout-Anordnung dockpanel speichern bei schließen
  - "Known Members" und Aliase, anstatt Umbenennung (zuerst Text-View mit Separator? Dann Neue View: Grid?)
  - Richtiges Logging (https://github.com/woanware/LogViewer2, https://github.com/codeaphex/SerilogViewer)
+ - Automatisches Stummhalten, solagne keine Meldung (wenn nicht Programmteilnehmer)
  - Über Dialog
  - Thread Dispatching als queue mit Debouncing
  - Settings-Seite (Teilnehmer gemäß Liste umbenennen, Automatisch eintreten lassen, Namensformat, Namensformat erzwingen?)
  - Video ein/aus
+OK key shortcuts im grid (enter, esc, plus, minus, pfeiltasten)
+OK Unterscheiden: Programmteilnehmer
+OK Sondernamen korrekt erkennen
+OK Layout-Anordnung dockpanel speichern bei schließen
 OK github API JSON-Parsing anstelle Release.xml
 OK Bilder aus Enum erzeugen EnumToImageConverter, nicht aus Attendee
 OK Publishing mit Symbolen funzt?
