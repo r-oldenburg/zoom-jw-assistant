@@ -137,6 +137,10 @@ namespace ZoomJWAssistant.Models
         public StateEnum State
         {
             get {
+                if (IsWaiting)
+                {
+                    return StateEnum.Waiting;
+                }
                 if (IsHost)
                 {
                     if (IsMuted)
@@ -154,7 +158,24 @@ namespace ZoomJWAssistant.Models
                             return StateEnum.HostLoud;
                     }
                 } else {
-                    if (IsMuted)
+                    if (IsPhone)
+                    {
+                        if (IsMuted)
+                        {
+                            if (IsHandRaised)
+                                return StateEnum.PhoneMutedHand;
+                            else
+                                return StateEnum.PhoneMuted;
+                        }
+                        else
+                        {
+                            if (IsHandRaised)
+                                return StateEnum.PhoneLoudHand;
+                            else
+                                return StateEnum.PhoneLoud;
+                        }
+                    }
+                    else if (IsMuted)
                     {
                         if (IsHandRaised)
                             return StateEnum.MutedHand;
@@ -216,8 +237,17 @@ namespace ZoomJWAssistant.Models
                     if (match.Success)
                     {
                         _name = match.Groups[1].Value;
-                        if (_name.EndsWith(" - ")) _name = _name.Substring(0, _name.Length - 3);
-                        _numberOfPersons = int.Parse(match.Groups[2].Value);
+                        if (char.IsDigit(_name[_name.Length - 1]))
+                        {
+                            _name = newName;
+                        } else
+                        {
+                            if (_name.EndsWith(" - "))
+                            {
+                                _name = _name.Substring(0, _name.Length - 3);
+                            }
+                            _numberOfPersons = int.Parse(match.Groups[2].Value);
+                        }
                     }
                 }
             }
@@ -242,18 +272,20 @@ namespace ZoomJWAssistant.Models
 
         public enum StateEnum
         {
-            Loud            = 0,
-            LoudHand        = 1,
-            Muted           = 2,
-            MutedHand       = 3,
-            HostLoud        = 4,
-            HostLoudHand    = 5,
-            HostMuted       = 6,
-            HostMutedHand   = 7,
-            PhoneLoud       = 8,
-            PhoneLoudHand   = 9,
-            PhoneMuted      = 10,
-            PhoneMutedHand  = 11,
+            Regular,
+            Waiting,
+            Loud,
+            LoudHand,
+            Muted,
+            MutedHand,
+            HostLoud,
+            HostLoudHand,
+            HostMuted,
+            HostMutedHand,
+            PhoneLoud,
+            PhoneLoudHand,
+            PhoneMuted,
+            PhoneMutedHand,
         }
     }
 }
