@@ -2,7 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using Svg2Xaml;
+using SharpVectors.Converters;
+using SharpVectors.Renderers.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -15,28 +16,12 @@ using ZoomJWAssistant.Models;
 
 namespace ZoomJWAssistant.ValueConverter
 {
-    public class AttendeeStateToImageConverter : IValueConverter
+    public class AttendeeStateToImageConverter : BaseToCachedImageConverter
     {
-        public char Separator { get; set; } = ';';
-
-        private static Dictionary<string, DrawingImage> _cache = new Dictionary<string, DrawingImage>();
-
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var name = GetImageNameFromAttendee((MeetingAttendee.StateEnum)value);
-            if (_cache.ContainsKey(name))
-            {
-                return _cache[name];
-            }
-            StreamResourceInfo sri = Application.GetResourceStream(new Uri(string.Format("Resources/symbols/{0}.svg", name), UriKind.Relative));
-            if (sri != null)
-            {
-                using (Stream s = sri.Stream)
-                {
-                    return _cache[name] = SvgReader.Load(sri.Stream);
-                }
-            }
-            return null;
+            return getCachedImageFromName(name);
         }
 
         private string GetImageNameFromAttendee(MeetingAttendee.StateEnum attendeeState)
@@ -44,14 +29,18 @@ namespace ZoomJWAssistant.ValueConverter
             switch (attendeeState)
             {
                 case MeetingAttendee.StateEnum.Loud:
+                case MeetingAttendee.StateEnum.Muted:
+                case MeetingAttendee.StateEnum.HostLoud:
+                case MeetingAttendee.StateEnum.HostMuted:
+                case MeetingAttendee.StateEnum.Regular:
+                    return "desktop-sharp";
+                case MeetingAttendee.StateEnum.Waiting:
+                    return "hourglass-outline";
+                case MeetingAttendee.StateEnum.MutedHand:
+                case MeetingAttendee.StateEnum.HostLoudHand:
+                case MeetingAttendee.StateEnum.HostMutedHand:
                 case MeetingAttendee.StateEnum.LoudHand:
                     return "hand-left-outline";
-                case MeetingAttendee.StateEnum.Muted:
-                case MeetingAttendee.StateEnum.MutedHand:
-                case MeetingAttendee.StateEnum.HostLoud:
-                case MeetingAttendee.StateEnum.HostLoudHand:
-                case MeetingAttendee.StateEnum.HostMuted:
-                case MeetingAttendee.StateEnum.HostMutedHand:
                 case MeetingAttendee.StateEnum.PhoneLoud:
                     return "call";
                 case MeetingAttendee.StateEnum.PhoneLoudHand:
@@ -63,11 +52,6 @@ namespace ZoomJWAssistant.ValueConverter
             }
 
             return "desktop";
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return null;
         }
     }
 }

@@ -31,8 +31,8 @@
     <InstallUrl>https://github.com/r-oldenburg/zoom-jw-assistant/releases/</InstallUrl>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>5</ApplicationRevision>
-    <ApplicationVersion>1.0.1.5</ApplicationVersion>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.2.0</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
@@ -121,13 +121,43 @@
     <Reference Include="nunit.framework, Version=3.13.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>packages\NUnit.3.13.1\lib\net45\nunit.framework.dll</HintPath>
     </Reference>
-    <Reference Include="Svg2Xaml, Version=0.3.0.7, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Svg2Xaml.0.3.0.7\lib\net40\Svg2Xaml.dll</HintPath>
+    <Reference Include="SharpVectors.Converters.Wpf, Version=1.7.1.0, Culture=neutral, PublicKeyToken=b532964b8548be77, processorArchitecture=MSIL">
+      <HintPath>packages\SharpVectors.1.7.1\lib\net47\SharpVectors.Converters.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpVectors.Core, Version=1.7.1.0, Culture=neutral, PublicKeyToken=7407205e337c98ef, processorArchitecture=MSIL">
+      <HintPath>packages\SharpVectors.1.7.1\lib\net47\SharpVectors.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpVectors.Css, Version=1.7.1.0, Culture=neutral, PublicKeyToken=7a46e3f532fdb787, processorArchitecture=MSIL">
+      <HintPath>packages\SharpVectors.1.7.1\lib\net47\SharpVectors.Css.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpVectors.Dom, Version=1.7.1.0, Culture=neutral, PublicKeyToken=517340b6277b1a7a, processorArchitecture=MSIL">
+      <HintPath>packages\SharpVectors.1.7.1\lib\net47\SharpVectors.Dom.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpVectors.Model, Version=1.7.1.0, Culture=neutral, PublicKeyToken=2236cfc76b505845, processorArchitecture=MSIL">
+      <HintPath>packages\SharpVectors.1.7.1\lib\net47\SharpVectors.Model.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpVectors.Rendering.Gdi, Version=1.7.1.0, Culture=neutral, PublicKeyToken=03902092284347e3, processorArchitecture=MSIL">
+      <HintPath>packages\SharpVectors.1.7.1\lib\net47\SharpVectors.Rendering.Gdi.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpVectors.Rendering.Wpf, Version=1.7.1.0, Culture=neutral, PublicKeyToken=d0902381100df30e, processorArchitecture=MSIL">
+      <HintPath>packages\SharpVectors.1.7.1\lib\net47\SharpVectors.Rendering.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpVectors.Runtime.Wpf, Version=1.7.1.0, Culture=neutral, PublicKeyToken=d16e717f0a981fb9, processorArchitecture=MSIL">
+      <HintPath>packages\SharpVectors.1.7.1\lib\net47\SharpVectors.Runtime.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Common, Version=4.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Drawing.Common.4.7.0\lib\net461\System.Drawing.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing.Primitives, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Drawing.Primitives.4.3.0\lib\net45\System.Drawing.Primitives.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.IdentityModel.Tokens.Jwt, Version=6.8.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>packages\System.IdentityModel.Tokens.Jwt.6.8.0\lib\net461\System.IdentityModel.Tokens.Jwt.dll</HintPath>
     </Reference>
@@ -174,6 +204,7 @@
     <Compile Include="ValueConverter\AttendeeToImageConverter.cs" />
     <Compile Include="ValueConverter\BooleanConverter.cs" />
     <Compile Include="ValueConverter\BooleanToVisibilityConverter .cs" />
+    <Compile Include="ValueConverter\BaseToCachedImageConverter.cs" />
     <Compile Include="ValueConverter\BoolToImageConverter.cs" />
     <Compile Include="ValueConverter\BoolToStringConverter.cs" />
     <Compile Include="ValueConverter\TypeNameConverter.cs" />
@@ -246,13 +277,18 @@
     <Resource Include="Resources\symbols\call.svg" />
     <Resource Include="Lizensierung.txt" />
     <Resource Include="Release.xml" />
-    <Content Include="Resources\symbols\call-hand.svg" />
-    <Content Include="Resources\symbols\call-mute-hand.svg" />
-    <Content Include="Resources\symbols\call-mute.svg" />
-    <Content Include="Resources\symbols\close-outline.svg" />
-    <Content Include="Resources\symbols\desktop.svg" />
-    <Content Include="Resources\symbols\hand-left-outline.svg" />
-    <Content Include="Resources\symbols\star.svg" />
+    <Resource Include="Resources\symbols\call-hand.svg" />
+    <Resource Include="Resources\symbols\call-mute-hand.svg" />
+    <Resource Include="Resources\symbols\call-mute.svg" />
+    <Resource Include="Resources\symbols\close-outline.svg" />
+    <Resource Include="Resources\symbols\desktop.svg" />
+    <Resource Include="Resources\symbols\hand-left-outline.svg" />
+    <Resource Include="Resources\symbols\hourglass-outline.svg" />
+    <Resource Include="Resources\symbols\hourglass-sharp.svg" />
+    <Resource Include="Resources\symbols\hourglass.svg" />
+    <Resource Include="Resources\symbols\star.svg" />
+    <Resource Include="Resources\symbols\desktop-outline.svg" />
+    <Resource Include="Resources\symbols\desktop-sharp.svg" />
     <Content Include="zoom-c-sharp-wrapper/bin/*.dll" Link="%(Filename)%(Extension)">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

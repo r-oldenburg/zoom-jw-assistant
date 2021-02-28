@@ -34,6 +34,7 @@
             </Style>
             <vc:BoolToStringConverter x:Key="BoolToStringConverter" />
             <vc:AttendeeToImageConverter x:Key="AttendeeToImageConverter" />
+            <vc:AttendeeStateToImageConverter x:Key="AttendeeStateToImageConverter" />
             <vc:TypeNameConverter x:Key="TypeNameConverter" />
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <vc:BooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter" True="Collapsed" False="Visible" />
@@ -124,11 +125,10 @@
                                             <KeyBinding Key="Return" Command="{Binding EditDataGridCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
                                         </DataGrid.InputBindings>
                                         <DataGrid.Columns>
-                                            <DataGridCheckBoxColumn Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=IsSelected, Mode=OneWay}" Header="" Width="Auto"/>
                                             <DataGridTemplateColumn Header="Typ" IsReadOnly="True" Width="Auto">
                                                 <DataGridTemplateColumn.CellTemplate>
                                                     <DataTemplate>
-                                                        <Image Width="16" Height="16" Source="{Binding Path=., Converter={StaticResource AttendeeToImageConverter}}" />
+                                                        <Image Width="16" Height="16" Source="{Binding Path=State, Converter={StaticResource AttendeeStateToImageConverter}}" />
                                                     </DataTemplate>
                                                 </DataGridTemplateColumn.CellTemplate>
                                             </DataGridTemplateColumn>
@@ -172,24 +172,16 @@
                                             </GroupStyle>
                                         </DataGrid.GroupStyle>
                                             -->
-                                                    <!-- 
                                         <DataGrid.RowStyle>
                                             <Style BasedOn="{StaticResource MahApps.Styles.DataGridRow}" TargetType="{x:Type DataGridRow}">
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding IsWaiting, Mode=OneWay}" Value="True">
-                                                        <Setter Property="Background" Value="#FF8B8B" />
-                                                        <Setter Property="Foreground" Value="DarkRed" />
+                                                        <Setter Property="FontStyle" Value="Italic" />
+                                                        <Setter Property="Foreground" Value="DarkGray" />
                                                     </DataTrigger>
-                                                    <MultiDataTrigger>
-                                                        <MultiDataTrigger.Conditions>
-                                                            <Condition Binding="{Binding Path=IsMouseOver, RelativeSource={RelativeSource Self}}" Value="true" />
-                                                        </MultiDataTrigger.Conditions>
-                                                        <Setter Property="Background" Value="#FFBDBD" />
-                                                    </MultiDataTrigger>
                                                 </Style.Triggers>
                                             </Style>
                                         </DataGrid.RowStyle>
-                                                    -->
                                         <DataGrid.Style>
                                             <Style BasedOn="{StaticResource MahApps.Styles.DataGrid}" TargetType="{x:Type DataGrid}">
                                                 <Setter Property="AlternatingRowBackground" Value="{DynamicResource MahApps.Brushes.Gray10}" />
