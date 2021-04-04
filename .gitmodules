@@ -1,0 +1,3 @@
+[submodule "zoom-c-sharp-wrapper"]
+	path = zoom-c-sharp-wrapper
+	url = https://gitea.zok.xyz/ZokRadonh/zoom-c-sharp-wrapper.git
