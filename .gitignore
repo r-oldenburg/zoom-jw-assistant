@@ -4,4 +4,6 @@ bin/
 obj/
 packages/
 publish/
-Test/
+Temp/
+Test/TestData.cs
+Test/*.txt

@@ -141,7 +141,7 @@ namespace ZoomJWAssistant.Models
                 {
                     return StateEnum.Waiting;
                 }
-                if (IsHost)
+                if (IsHost || IsCoHost)
                 {
                     if (IsMuted)
                     {

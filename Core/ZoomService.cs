@@ -133,27 +133,31 @@ namespace ZoomJWAssistant.Core
                 return Task.FromResult(AuthResult.AUTHRET_SUCCESS);
             }
 
+            var sdkKey = Environment.ExpandEnvironmentVariables(ConfigurationManager.AppSettings["sdkKey"]);
+            var sdkSecret = Environment.ExpandEnvironmentVariables(ConfigurationManager.AppSettings["sdkSecret"]);
+            var token = JWTTokenCreator.CreateToken(sdkKey, sdkSecret);
+
             var t = new TaskCompletionSource<AuthResult>();
 
             authService.Add_CB_onAuthenticationReturn(err =>
             {
                 if (AuthResult.AUTHRET_SUCCESS == err)
                 {
-                    Console.WriteLine("Zoom SDK erfolgreich authentifiziert.");
+                    Console.WriteLine("Token: " + token);
+                    Console.WriteLine("Zoom SDK erfolgreich authentifiziert. " + token.Length);
                     authenticatedSDK = true;
                     t.TrySetResult(err);
                 }
                 else
                 {
                     Console.WriteLine("Zoom SDK Authentifikations-Fehler: " + err.ToString());
+                    Console.WriteLine("Token: " + token);
                     t.TrySetException(new Exception("Zoom SDK Auth Failure: " + err.ToString()));
                 }
             });
 
-            var sdkKey = Environment.ExpandEnvironmentVariables(ConfigurationManager.AppSettings["sdkKey"]);
-            var sdkSecret = Environment.ExpandEnvironmentVariables(ConfigurationManager.AppSettings["sdkSecret"]);
 
-            InvokeAPI(() => authService.SDKAuth(new AuthContext { jwt_token = JWTTokenCreator.CreateToken(sdkKey, sdkSecret) }));
+            InvokeAPI(() => authService.SDKAuth(new AuthContext { jwt_token = token }));
 
             return t.Task;
         }
@@ -244,6 +248,7 @@ namespace ZoomJWAssistant.Core
             if (attendee != null)
             {
                 Attendees.ToList().ForEach(x => x.IsHost = false);
+                Console.WriteLine("Neuer Host! " + attendee.Name);
                 attendee.IsHost = true;
             }
         }
@@ -254,7 +259,7 @@ namespace ZoomJWAssistant.Core
             if (attendee != null)
             {
                 Console.WriteLine("Neuer CoHost! " + attendee.Name);
-                attendee.IsHost = isCoHost;
+                attendee.IsCoHost = isCoHost;
             }
         }
 

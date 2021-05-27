@@ -20,6 +20,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Text;
 using ZoomJWAssistant.Update;
+using System.Linq;
 
 namespace ZoomJWAssistant
 {
@@ -291,6 +292,11 @@ namespace ZoomJWAssistant
         private void ResetLayoutButton_Click(object sender, RoutedEventArgs e)
         {
             RestoreDefaultDockLayout();
+        }
+
+        private void PrintNamesButton_Click(object sender, RoutedEventArgs e)
+        {
+            ZoomService.Attendees.ToList().ForEach(x => Console.WriteLine(x.Name + " > " + x.PreviousNames.LastOrDefault()));
         }
 
         private void ToggleButton_Click(object sender, RoutedEventArgs e)
