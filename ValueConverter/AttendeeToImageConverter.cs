@@ -31,7 +31,7 @@ namespace ZoomJWAssistant.ValueConverter
                 return "call";
             }
 
-            if (attendee.IsHost)
+            if (attendee.IsHost || attendee.IsCoHost)
             {
                 return "star";
             }

@@ -44,6 +44,7 @@
     <mah:MetroWindow.LeftWindowCommands>
         <mah:WindowCommands>
             <ToggleButton Click="ResetLayoutButton_Click" Content="Reset Layout" />
+            <ToggleButton Click="PrintNamesButton_Click" Content="Namensliste" />
         </mah:WindowCommands>
     </mah:MetroWindow.LeftWindowCommands>
 

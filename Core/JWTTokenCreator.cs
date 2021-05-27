@@ -7,7 +7,7 @@ namespace ZoomJWAssistant.Core
 {
     class JWTTokenCreator
     {
-        public static string CreateToken(string apiKey = "8EI2lOoYB4xq1TPR9RedvtvhCmUkY2uZ4F80", string apiSecret = "bkX9MjK4pkGolyTixPPXhtAgH4MAh1QfiVd4")
+        public static string CreateToken(string apiKey, string apiSecret)
         {
            // Create Security key  using private key above:
            // not that latest version of JWT using Microsoft namespace instead of System
